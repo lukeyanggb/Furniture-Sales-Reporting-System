@@ -10,12 +10,12 @@ from sqlalchemy import inspect
 
 app = Flask(__name__)
 
-# # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:HuaLi1993**@localhost:5432/test'
+# # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/test'
 # db = SQLAlchemy(app)
 # # class companyReport(db.Model):
 # #     __tablename__ = "category"
 
-# engine = create_engine('postgresql://postgres:HuaLi1993*@localhost:5432/test')
+# engine = create_engine('postgresql://postgres:password@localhost:5432/test')
 
 
 # engine = db.engine
@@ -31,7 +31,7 @@ app = Flask(__name__)
 
 
     
-
+# dummy data base
 all_city = [
     {
     'state':'NY',

@@ -9,12 +9,10 @@
 {{ super() }}
 <h1>Category Report</h1>
 
-    {% for post in posts %}
-   
-    
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.content }}</p>
-
-    {% endfor%}
+{% for category in posts %}
+<h1>{{category.category_name}}</h1>
+{% else %}
+<p> No product found </p>
+{% endfor %}
 
 {% endblock %}

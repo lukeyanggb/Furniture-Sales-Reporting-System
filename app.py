@@ -55,6 +55,27 @@ all_city = [
 },
 ]
 
+
+States = [
+    {
+    'state':'NY',
+    
+},
+ {
+    'state':'CA',
+   
+},
+ {
+    'state':'GA',
+   
+},
+{
+    'state':'TX',
+  
+},
+]
+
+
 @app.route('/')
 def index():
     return render_template('main_menu.html')
@@ -77,7 +98,7 @@ def couacheSofas():
 
 @app.route('/storeRev')
 def storeRev():
-    return render_template('storeRev.html')   
+    return render_template('storeRev.html',posts = States)   
 
 @app.route('/highestVol')
 def highestVol():

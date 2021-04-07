@@ -13,13 +13,23 @@
 {{ super() }}
 <h1>Childcare Sales Volume Report</h1>
 
-    {% for post in posts %}
-   
-    
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.content }}</p>
-
-    {% endfor%}
+  <table>
+    <thead>
+      <tr>
+      {% for col in header %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in table %}
+      {% for col in row %}
+        <td>{{ col }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 
 {% endblock %}
 

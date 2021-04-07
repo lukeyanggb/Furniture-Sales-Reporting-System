@@ -71,13 +71,9 @@ def cityPop():
 def category_report():
     return render_template('category_report.html')
 
-    
-
-
 @app.route('/sofa')
 def couacheSofas():
     return render_template('sofa.html')   
-
 
 @app.route('/storeRev')
 def storeRev():

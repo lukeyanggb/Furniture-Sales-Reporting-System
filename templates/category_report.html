@@ -9,10 +9,22 @@
 {{ super() }}
 <h1>Category Report</h1>
 
-{% for category in posts %}
-<h1>{{category.category_name}}</h1>
-{% else %}
-<p> No product found </p>
-{% endfor %}
+  <table>
+    <thead>
+      <tr>
+      {% for col in header %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in table %}
+      {% for col in row %}
+        <td>{{ col }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 
 {% endblock %}

@@ -13,12 +13,54 @@
 {{ super() }}
 <h1>Holiday</h1>
 
-    {% for post in posts %}
-   
+<h2>View Holiday</h2>
+<div>
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          Pick a holiday
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            {% for holiday in posts %}
+            <li><a class="dropdown-item" href="#">{{holiday[0]}}</a></li>
+        {% endfor%}
+    </ul>
+      </div>
+    <p></p>
     
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.content }}</p>
+    <form action = "#" method = "POST">
+        <input type = 'Date' name = "Date" placeholder = "Enter Date" value = "{{Date if Date}}"/>
+        <input type = "submit" value = "submit"/>
+    </form>
+</div>
 
-    {% endfor%}
+
+<h2>Add Holiday</h2>
+
+<form action = "#" method = "POST">
+    <input type = 'Date' name = "Date" placeholder = "Enter Date" value = "{{Date if Date}}"/>
+    <input type = "submit" value = "submit"/>
+    <input type = 'holiday' name = "holiday" placeholder = "Enter holiday" value = "{{holiday if holiday}}"/>
+    <input type = "submit" value = "submit"/>
+    
+    
+</form>
+
+  <table>
+    <thead>
+      <tr>
+      {% for col in header %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in table %}
+      {% for col in row %}
+        <td>{{ col }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 
 {% endblock %}

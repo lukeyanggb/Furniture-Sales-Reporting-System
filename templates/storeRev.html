@@ -21,7 +21,7 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         {% for state in posts %}
-        <li><a class="dropdown-item" href="#">{{state.state}}</a></li>
+        <li><a class="dropdown-item" href="#">{{state[0]}}</a></li>
     {% endfor%}
 </ul>
   </div>
@@ -29,4 +29,21 @@
   <p></p>
   <p></p>
 
+  <table>
+    <thead>
+      <tr>
+      {% for col in header %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in table %}
+      {% for col in row %}
+        <td>{{ col }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

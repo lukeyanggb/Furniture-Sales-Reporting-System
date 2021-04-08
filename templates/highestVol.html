@@ -25,7 +25,23 @@
 
 {% block body %}
 
-{{ super() }}
+  <table>
+    <thead>
+      <tr>
+      {% for col in header %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in table %}
+      {% for col in row %}
+        <td>{{ col }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 
 <h1>State with Highest Volume for Each Category by Month</h1>
 <div class="container">

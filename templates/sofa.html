@@ -14,21 +14,30 @@
 <h1>Couches and Sofas Report</h1>
 
 
-  <table>
+<table class="table">
     <thead>
       <tr>
-      {% for col in header %}
-        <th>{{ col }}</th>
+        
+        {% for col in header %}
+        <th scope="col">{{ col }}</th>
+        
       {% endfor %}
       </tr>
     </thead>
     <tbody>
-    {% for row in table %}
-      {% for col in row %}
-        <td>{{ col }}</td>
+      <tr>
+  
+        {% for row in table %}     
+     
+            {% for col in row %}
+                 <td>{{ col }}</td>
+            
+             {% endfor %}
+        </tr>
       {% endfor %}
+          
+        
       </tr>
-    {% endfor %}
     </tbody>
   </table>
 

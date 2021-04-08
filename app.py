@@ -160,7 +160,7 @@ def storeRev():
     header, States = db.execute(statequery)
     
 
-    return render_template('storeRev.html',posts = States)  
+    return render_template('storeRev.html', posts = States)  
 
     query = \
     """

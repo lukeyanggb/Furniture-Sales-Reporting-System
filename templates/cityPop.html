@@ -24,7 +24,7 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         {% for city in posts %}
-        <li><a class="dropdown-item" href="#">{{city.city_name}}</a></li>
+        <li><a class="dropdown-item" href="#">{{city[0]}}</a></li>
     {% endfor%}
 </ul>
   </div>

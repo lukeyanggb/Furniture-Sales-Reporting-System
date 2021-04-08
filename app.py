@@ -26,6 +26,27 @@ all_city = [
 },
 ]
 
+
+States = [
+    {
+    'state':'NY',
+    
+},
+ {
+    'state':'CA',
+   
+},
+ {
+    'state':'GA',
+   
+},
+{
+    'state':'TX',
+  
+},
+]
+
+
 @app.route('/')
 def index():
     return render_template('main_menu.html')
@@ -33,12 +54,28 @@ def index():
 @app.route('/holiday')
 def holiday():
     # header, table = db.execute(query)
-    return render_template('holiday.html') 
+    statequery = \
+    """
+   SELECT distinct holiday_name FROM holiday;
+                         
+    """
+    header, holidies = db.execute(statequery)
+    
+
+    return render_template('holiday.html',posts = holidies) 
 
 @app.route('/cityPop')
 def cityPop():
-    # header, table = db.execute(query)
-    return render_template('cityPop.html', posts = all_city)   
+    # added city selection dropdown
+    statequery = \
+    """
+   SELECT distinct city_name FROM city;
+                         
+    """
+    header, cities = db.execute(statequery)
+    
+ 
+    return render_template('cityPop.html', posts = cities)   
 
 @app.route('/category_report')
 def category_report():
@@ -114,6 +151,17 @@ def couacheSofas():
 
 @app.route('/storeRev')
 def storeRev():
+    # add selection for states
+    statequery = \
+    """
+   SELECT distinct state FROM city;
+                         
+    """
+    header, States = db.execute(statequery)
+    
+
+    return render_template('storeRev.html',posts = States)  
+
     query = \
     """
     SELECT s.store_number,
@@ -145,50 +193,51 @@ def storeRev():
 
 @app.route('/highestVol')
 def highestVol():
-    query = \
-    """
-    SELECT category_name,
-        state,
-        volume
-    FROM  (SELECT category_name,
-                state,
-                volume,
-                Rank()
-                    OVER (
-                    partition BY category_name
-                    ORDER BY volume DESC ) AS Rank
-        FROM   (SELECT category_name,
-                        Sum(quantity)AS Volume,
-                        state
-                FROM  (SELECT category_name,
-                                quantity,
-                                store_number
-                        FROM  (SELECT category_name,
-                                        quantity,
-                                        store_number,
-                                        Extract(year FROM T.date) AS YEAR,
-                                        Extract(month FROM T.date)AS month
-                                FROM   incategory AS I
-                                        INNER JOIN TRANSACTION AS T
-                                                ON I.productid = T.productid)AS A
-                        WHERE  year = $year
-                                AND month = $month)AS C
-                        INNER JOIN (SELECT S.store_number,
-                                            city_name,
-                                            state
-                                    FROM   store AS S
-                                            INNER JOIN TRANSACTION AS T
-                                                    ON
-                                            S.store_number = T.store_number)AS
-                                    L
-                                ON C.store_number = L.store_number
-                GROUP  BY category_name,
-                            state
-                ORDER  BY category_name ASC) a) a
-    WHERE  rank = 1 
-    """
-    header, table = db.execute(query)
-    return render_template('highestVol.html', table=table, header=header)   
+    # query = \
+    # """
+    # SELECT category_name,
+    #     state,
+    #     volume
+    # FROM  (SELECT category_name,
+    #             state,
+    #             volume,
+    #             Rank()
+    #                 OVER (
+    #                 partition BY category_name
+    #                 ORDER BY volume DESC ) AS Rank
+    #     FROM   (SELECT category_name,
+    #                     Sum(quantity)AS Volume,
+    #                     state
+    #             FROM  (SELECT category_name,
+    #                             quantity,
+    #                             store_number
+    #                     FROM  (SELECT category_name,
+    #                                     quantity,
+    #                                     store_number,
+    #                                     Extract(year FROM T.date) AS YEAR,
+    #                                     Extract(month FROM T.date)AS month
+    #                             FROM   incategory AS I
+    #                                     INNER JOIN TRANSACTION AS T
+    #                                             ON I.productid = T.productid)AS A
+    #                     WHERE  year = $year
+    #                             AND month = $month)AS C
+    #                     INNER JOIN (SELECT S.store_number,
+    #                                         city_name,
+    #                                         state
+    #                                 FROM   store AS S
+    #                                         INNER JOIN TRANSACTION AS T
+    #                                                 ON
+    #                                         S.store_number = T.store_number)AS
+    #                                 L
+    #                             ON C.store_number = L.store_number
+    #             GROUP  BY category_name,
+    #                         state
+    #             ORDER  BY category_name ASC) a) a
+    # WHERE  rank = 1 
+    # """
+    # header, table = db.execute(query)
+    return render_template('highestVol.html')
+    #return render_template('highestVol.html', table=table, header=header) 
 
 @app.route('/revByPop')
 def revByPop():
@@ -421,6 +470,18 @@ def campaign():
     """
     header, table = db.execute(query)
     return render_template('campaign.html', table=table, header=header)
+
+
+
+@app.route('/test')
+def test():
+    query = \
+    """
+   SELECT state FROM city;
+                         
+    """
+    header, table = db.execute(query)
+    return render_template('test.html', table=table, header=header) 
 
 
 if __name__ == '__main__':

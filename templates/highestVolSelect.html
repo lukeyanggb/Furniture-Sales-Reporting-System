@@ -25,6 +25,7 @@
 {{ super() }}
 
 <h1>State with Highest Volume for Each Category by Month</h1>
+<form onsubmit='submitForm(event)'>
 <div class="container">
     <div class="col-sm-6" style="height:130px;">
        <div class="form-group">
@@ -45,34 +46,9 @@
            });
        });
     </script>
- </div>
+</div>
+</form>
 
-<table class="table">
-    <thead>
-      <tr>
-        
-        {% for col in header %}
-        <th scope="col">{{ col }}</th>
-        
-      {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
-        </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
 
  
 {% endblock %}

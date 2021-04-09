@@ -203,53 +203,57 @@ def storeRev(selectstate):
     return render_template('storeRev.html', posts = States, table=table, header=header)  
 
 
-@app.route('/highestVol')
-def highestVol():
-    # query = \
-    # """
-    # SELECT category_name,
-    #     state,
-    #     volume
-    # FROM  (SELECT category_name,
-    #             state,
-    #             volume,
-    #             Rank()
-    #                 OVER (
-    #                 partition BY category_name
-    #                 ORDER BY volume DESC ) AS Rank
-    #     FROM   (SELECT category_name,
-    #                     Sum(quantity)AS Volume,
-    #                     state
-    #             FROM  (SELECT category_name,
-    #                             quantity,
-    #                             store_number
-    #                     FROM  (SELECT category_name,
-    #                                     quantity,
-    #                                     store_number,
-    #                                     Extract(year FROM T.date) AS YEAR,
-    #                                     Extract(month FROM T.date)AS month
-    #                             FROM   incategory AS I
-    #                                     INNER JOIN TRANSACTION AS T
-    #                                             ON I.productid = T.productid)AS A
-    #                     WHERE  year = $year
-    #                             AND month = $month)AS C
-    #                     INNER JOIN (SELECT S.store_number,
-    #                                         city_name,
-    #                                         state
-    #                                 FROM   store AS S
-    #                                         INNER JOIN TRANSACTION AS T
-    #                                                 ON
-    #                                         S.store_number = T.store_number)AS
-    #                                 L
-    #                             ON C.store_number = L.store_number
-    #             GROUP  BY category_name,
-    #                         state
-    #             ORDER  BY category_name ASC) a) a
-    # WHERE  rank = 1 
-    # """
-    # header, table = db.execute(query)
-    return render_template('highestVol.html')
-    #return render_template('highestVol.html', table=table, header=header) 
+@app.route('/highestVolSelect')
+def highestVolSelect():
+    return render_template('highestVolSelect.html')
+
+@app.route('/highestVol/<int:yr>/<int:m>')
+def highestVol(yr, m):
+    query = \
+    """
+    SELECT category_name,
+        state,
+        volume
+    FROM  (SELECT category_name,
+                state,
+                volume,
+                Rank()
+                    OVER (
+                    partition BY category_name
+                    ORDER BY volume DESC ) AS Rank
+        FROM   (SELECT category_name,
+                        Sum(quantity)AS Volume,
+                        state
+                FROM  (SELECT category_name,
+                                quantity,
+                                store_number
+                        FROM  (SELECT category_name,
+                                        quantity,
+                                        store_number,
+                                        Extract(year FROM T.date) AS YEAR,
+                                        Extract(month FROM T.date)AS month
+                                FROM   incategory AS I
+                                        INNER JOIN TRANSACTION AS T
+                                                ON I.productid = T.productid)AS A
+                        WHERE  year = %d
+                                AND month = %d)AS C
+                        INNER JOIN (SELECT S.store_number,
+                                            city_name,
+                                            state
+                                    FROM   store AS S
+                                            INNER JOIN TRANSACTION AS T
+                                                    ON
+                                            S.store_number = T.store_number)AS
+                                    L
+                                ON C.store_number = L.store_number
+                GROUP  BY category_name,
+                            state
+                ORDER  BY category_name ASC) a) a
+    WHERE  rank = 1 
+    """
+    header, table = db.execute(query % (yr, m)) 
+    return render_template('highestVol.html', table=table, header=header) 
+
 
 @app.route('/revByPop')
 def revByPop():

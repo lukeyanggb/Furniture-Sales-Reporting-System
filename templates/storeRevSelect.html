@@ -13,7 +13,7 @@
 {{ super() }}
 <h1>Store Revenue by Year by state report</h1>
 
-  <p></p>
+<p></p>
 
 <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -26,30 +26,7 @@
 </ul>
 </div>
 
-<table class="table">
-    <thead>
-      <tr>
-        
-        {% for col in header %}
-        <th scope="col">{{ col }}</th>
-        
-      {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
-        </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
+  <p></p>
+  <p></p>
+
 {% endblock %}

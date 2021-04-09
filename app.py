@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__)
 import db
 
@@ -149,29 +149,40 @@ def couacheSofas():
     header, table = db.execute(query)
     return render_template('sofa.html', table=table, header=header)   
 
-@app.route('/storeRev')
-def storeRev():
+@app.route('/storeRevSelect')
+def storeRevSelect():
     # add selection for states
     statequery = \
     """
-   SELECT distinct state FROM city;
-                         
+    SELECT distinct state FROM city;                         
     """
-    header, States = db.execute(statequery)
+    _, States = db.execute(statequery)
+
+    # if request.method == 'POST':
+    #     selectstate = request.form.get('selectstate')
+    #     return render_template('storeRev.html', selectstate)
+    return render_template('storeRevSelect.html', posts = States)
+
+
+@app.route('/storeRev/<selectstate>')
+def storeRev(selectstate):
+    # add selection for states
+    statequery = \
+    """
+    SELECT distinct state FROM city;                         
+    """
+    _, States = db.execute(statequery)
     
-
-    return render_template('storeRev.html', posts = States)  
-
     query = \
     """
     SELECT s.store_number,
-       address,
-       city_name,
-       Extract(year FROM t.date) AS Year,
-       Sum(quantity * ( CASE
-                          WHEN d.discount_price IS NULL THEN regular_price
-                          WHEN d.discount_price IS NOT NULL THEN
-                          d.discount_price
+    address,
+    city_name,
+    Extract(year FROM t.date) AS Year,
+    Sum(quantity * ( CASE
+                        WHEN d.discount_price IS NULL THEN regular_price
+                        WHEN d.discount_price IS NOT NULL THEN
+                        d.discount_price
                         END ))   AS Revenue
     FROM   store AS s
         natural JOIN city
@@ -182,14 +193,15 @@ def storeRev():
                         AND t.date = d.date
     WHERE  city_name IN (SELECT city_name
                         FROM   city
-                        WHERE  state = '$state')
+                        WHERE  state = \'%s\')
     GROUP  BY s.store_number,
             year
     ORDER  BY year,
             revenue DESC;
     """
-    header, table = db.execute(query)
-    return render_template('storeRev.html', table=table, header=header)   
+    header, table = db.execute(query % selectstate)
+    return render_template('storeRev.html', posts = States, table=table, header=header)  
+
 
 @app.route('/highestVol')
 def highestVol():

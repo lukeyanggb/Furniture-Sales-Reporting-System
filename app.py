@@ -2,50 +2,6 @@ from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__)
 import db
 
-# dummy data base
-all_city = [
-    {
-    'state':'NY',
-    'city_name': 'New York',
-    'Population': '122345'
-},
- {
-    'state':'NY',
-    'city_name': 'West Chester',
-    'Population': '13213132'
-},
- {
-    'state':'TX',
-    'city_name': 'Austin',
-    'Population': '31313131'
-},
-{
-    'state':'TX',
-    'city_name': 'Dallas',
-    'Population': '3131314'
-},
-]
-
-
-States = [
-    {
-    'state':'NY',
-    
-},
- {
-    'state':'CA',
-   
-},
- {
-    'state':'GA',
-   
-},
-{
-    'state':'TX',
-  
-},
-]
-
 
 @app.route('/')
 def index():

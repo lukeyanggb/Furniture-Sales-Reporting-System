@@ -7,31 +7,118 @@ import db
 def index():
     return render_template('main_menu.html')
 
-@app.route('/holiday')
-def holiday():
-    # header, table = db.execute(query)
+@app.route('/holidaySelect')
+
+def holidaySelect():
+   
     statequery = \
     """
-   SELECT distinct holiday_name FROM holiday;
+   SELECT distinct holiday_name as holiday FROM holiday;
                          
     """
-    header, holidies = db.execute(statequery)
+    _, holidies = db.execute(statequery)
     
 
-    return render_template('holiday.html',posts = holidies) 
+    return render_template('holidaySelect.html', posts = holidies) 
 
-@app.route('/cityPop')
-def cityPop():
+@app.route('/holiday/<selecthol>')
+def holiday(selecthol):
+    statequery = \
+    """
+   SELECT distinct holiday_name as holiday FROM holiday;
+                         
+    """
+    _, holidies = db.execute(statequery)
+
+    # header, table = db.execute(query)
+    holquery = \
+    """
+   SELECT *  FROM holiday WHERE holiday_name =  \'%s\';
+                         
+    """
+    header, table = db.execute(holquery % selecthol)
+    
+
+    return render_template('holiday.html',posts = holidies, table=table, header=header) 
+
+
+@app.route('/holiday/<selectdate>')
+def holidayDate(selectdate):
+    statequery = \
+    """
+   SELECT distinct date FROM holiday;
+                         
+    """
+    _, date = db.execute(statequery)
+
+    # header, table = db.execute(query)
+    holquery = \
+     """
+   SELECT *  FROM holiday WHERE date =  \'%s\';
+                         
+    """
+    header, table = db.execute(holquery % selectdate)
+    
+
+    return render_template('holiday.html',posts = date, table=table, header=header) 
+
+
+@app.route('/cityPopSelect')
+
+def cityPopSelect():
+    #selectCity
     # added city selection dropdown
     statequery = \
     """
    SELECT distinct city_name FROM city;
                          
     """
-    header, cities = db.execute(statequery)
-    
+    _, cities = db.execute(statequery)
+    return render_template('cityPopSelect.html', posts = cities)
+
+
+@app.route('/cityPop/<selectCity>')
+
+def cityPop(selectCity):
+    #selectCity
+    # added city selection dropdown
+    statequery = \
+    """
+   SELECT distinct city_name FROM city;
+                         
+    """
+    _, cities = db.execute(statequery)
+    query = \
+        """
+         SELECT city_name, city_population FROM city
+         WHERE city_name =  \'%s\';
+        """
+    header, table = db.execute(query % selectCity)
  
-    return render_template('cityPop.html', posts = cities)   
+    return render_template('cityPop.html', posts = cities, table=table, header=header)   
+
+# @app.route('/cityPop/update/<City>')
+# def cityPopUpdate(cityPopNum, State, City):
+#     #selectCity
+#     # added city selection dropdown
+#     statequery = \
+#     """
+#    SELECT distinct city_name FROM city;
+                         
+#     """
+#     _, cities = db.execute(statequery)
+#     query = \
+#         """
+#        UPDATE city
+#        SET    city_population = \'%a\'
+#        WHERE  state =\'%s\'
+#        AND city_name = \'%c\' 
+#         """
+#     header, table = db.execute(query % (cityPopNum, State, City))
+ 
+#     return render_template('cityPop.html', posts = cities, table=table, header=header)   
+
+
 
 @app.route('/category_report')
 def category_report():
@@ -211,7 +298,9 @@ def highestVol():
 def revByPop():
     query = \
     """
-    SELECT *
+    SELECT CAST(year AS VARCHAR(10)), CAST(small AS INT),CAST(medium AS INT),CAST(large AS INT),CAST(extra_large AS INT)
+ FROM
+ (SELECT *
     FROM   crosstab ( 'WITH CityRevenue(year, city_size, revenue) AS (SELECT   year,
             city_size,
             Sum(revenue)AS revenue
@@ -251,7 +340,7 @@ def revByPop():
     GROUP BY year,
             city_size
     ORDER BY year) 
-    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, small DOUBLE PRECISION, medium DOUBLE PRECISION, large DOUBLE PRECISION, extra_large DOUBLE PRECISION);
+    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, small DOUBLE PRECISION, medium DOUBLE PRECISION, large DOUBLE PRECISION, extra_large DOUBLE PRECISION)) a;
     """
     header, table = db.execute(query)
     return render_template('revByPop.html', table=table, header=header)   

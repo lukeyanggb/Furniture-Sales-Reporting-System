@@ -1,4 +1,18 @@
 # cs6400-2021-01-Team054
+## Postgresql configuration file
+You need a configuration file named `database.ini` to store all connection parameters.
+
+The following shows the contents of the `database.ini` file:
+```
+[postgresql]
+host=localhost
+database=suppliers
+user=postgres
+password=SecurePas$1
+```
+
+Notice that if you git, you need to add the `database.ini` to the `.gitignore` file to not committing the sensitive information to the public.
+
 ## Dependencies
 * Python>=3.7.9
 * Flask==1.1.2

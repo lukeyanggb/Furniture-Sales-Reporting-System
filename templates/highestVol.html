@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block nav_there %}active{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+
+{% block body %}
+
+{{ super() }}
+
+<h1>State with Highest Volume for Each Category by Month</h1>
+<div style="width: 30%">
+    {{ wtf.quick_form(form)}}
+</div>
+
+<p></p>
+<p></p>
+
+<table class="table">
+    <thead>
+      <tr>
+        
+        {% for col in header %}
+        <th scope="col">{{ col }}</th>
+        
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+  
+        {% for row in table %}     
+     
+            {% for col in row %}
+                 <td>{{ col }}</td>
+            
+             {% endfor %}
+        </tr>
+      {% endfor %}
+          
+        
+      </tr>
+    </tbody>
+  </table>
+
+ 
+{% endblock %}

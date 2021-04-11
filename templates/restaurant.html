@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block nav_there %}active{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+
+
+
+{% block body %}
+{{ super() }}
+<h1>Restaurant Impact</h1>
+
+ 
+<table class="table">
+    <thead>
+      <tr>
+        
+        {% for col in header %}
+        <th scope="col">{{ col }}</th>
+        
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+  
+        {% for row in table %}     
+     
+            {% for col in row %}
+                 <td>{{ col }}</td>
+            
+             {% endfor %}
+        </tr>
+      {% endfor %}
+          
+        
+      </tr>
+    </tbody>
+  </table>
+{% endblock %}
+

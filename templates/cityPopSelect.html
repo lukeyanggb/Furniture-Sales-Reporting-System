@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block nav_there %}active{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+
+
+
+{% block body %}
+{{ super() }}
+<h1>City Population</h1>
+
+<p></p>
+<h3>View City Population</h3>
+
+<p></p>
+
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+      Find City
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        {% for city in posts %}
+        <li><a class="dropdown-item" href="/cityPop/{{city[0]}}">{{city[0]}}</a></li>
+        {% endfor%}
+</ul>
+  </div>
+
+<p></p>
+
+  <h3>Update city population:</h3>
+<h4>Select city you want to update:</h4>
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+      Find City
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        {% for city in posts %}
+        <li><a class="dropdown-item" href="/cityPop/update/{{city[0]}}">{{city[0]}}</a></li>
+    {% endfor%}
+</ul>
+  </div>
+
+<h4> Enter updated population:</h4>
+<form action = "#" method = "POST">
+    <input type = 'Population' name = "Population" placeholder = "Enter number" value = "{{Population if Population}}"/>
+    <input type = "submit" value = "submit"/>
+
+  {% endblock %}

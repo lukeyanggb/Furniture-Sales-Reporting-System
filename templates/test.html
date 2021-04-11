@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block nav_there %}active{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+
+
+
+{% block body %}
+{{ super() }}
+<h1>Campaign Analysis Report</h1>
+
+
+
+  <table>
+    <thead>
+      <tr>
+      {% for col in header %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in table %}
+      {% for col in row %}
+        <td>{{ col }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

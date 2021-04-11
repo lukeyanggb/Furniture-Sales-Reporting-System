@@ -50,8 +50,6 @@ def holiday():
         SELECT * FROM holiday WHERE date = '%d-%d-%d';             
         """
         _, table = db.execute(query % (year, month, day))
-        print(type(table))
-        print(table)
         # if no record:
         if len(table) == 0:
             query = \
@@ -97,7 +95,6 @@ def holidayShowDate(yr, m, d):
     """
     SELECT * FROM holiday WHERE date = '%d-%d-%d';             
     """
-    print(query % (yr, m, d))
     header, table = db.execute(query % (yr, m, d))
     return render_template('holidayShow.html', table=table, header=header) 
 

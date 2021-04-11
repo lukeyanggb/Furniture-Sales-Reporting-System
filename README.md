@@ -6,9 +6,9 @@ The following shows the contents of the `database.ini` file:
 ```
 [postgresql]
 host=localhost
-database=suppliers
-user=postgres
-password=SecurePas$1
+database=databasename
+user=username
+password=userpassword
 ```
 
 Notice that if you git, you need to add the `database.ini` to the `.gitignore` file to not committing the sensitive information to the public.

@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 import db
 
 app = Flask(__name__)
-
+a = 'ttttt'
 Bootstrap(app)
 # Flask-WTF requires an encryption key - the string can be anything
 app.config['SECRET_KEY'] = 'TEAM054_DB6400'

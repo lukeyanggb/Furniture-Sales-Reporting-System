@@ -67,14 +67,31 @@ def holiday():
             UPDATE holiday SET holiday_name = '%s' WHERE date = '%d/%d/%d';             
             """
             db.update(query % (name, year, month, day))
-        return redirect( url_for('holidayShow', yr=year, m=month, d=day))
+        return redirect( url_for('holidayShowDate', yr=year, m=month, d=day))
     else:
         message = 'Invalid input.'
 
     return render_template('holiday.html', posts = holidays, form=form, message=message) 
 
+@app.route('/holiday/<selecthol>')
+def holidayShowHD(selecthol):
+    # header, table = db.execute(query)
+    query = \
+    """
+    SELECT distinct holiday_name FROM holiday;
+                         
+    """
+    _, holidays = db.execute(query)
+    # header, table = db.execute(query)
+    holquery = \
+    """
+    SELECT *  FROM holiday WHERE holiday_name =  \'%s\';                   
+    """
+    header, table = db.execute(holquery % selecthol)
+    return render_template('holidayShow.html', posts = holidays, table=table, header=header) 
+
 @app.route('/holiday/<int:yr>/<int:m>/<int:d>')
-def holidayShow(yr, m, d):
+def holidayShowDate(yr, m, d):
     # header, table = db.execute(query)
     query = \
     """

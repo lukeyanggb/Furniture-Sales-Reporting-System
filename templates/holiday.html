@@ -22,7 +22,7 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
             {% for holiday in posts %}
-            <li><a class="dropdown-item" href="#">{{holiday[0]}}</a></li>
+            <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
         {% endfor%}
     </ul>
       </div>

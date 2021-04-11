@@ -11,7 +11,7 @@ user=username
 password=userpassword
 ```
 
-Notice that if you git, you need to add the `database.ini` to the `.gitignore` file to not committing the sensitive information to the public.
+Change `database`, `user`, `password` values to your local postgresql configurations. Notice that you need to add the `database.ini` to the `.gitignore` file to not committing the sensitive information to the public.
 
 ## Dependencies
 * Python>=3.7.9

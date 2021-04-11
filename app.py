@@ -101,18 +101,63 @@ def holidayShowDate(yr, m, d):
     header, table = db.execute(query % (yr, m, d))
     return render_template('holidayShow.html', table=table, header=header) 
 
-@app.route('/cityPop')
-def cityPop():
+
+@app.route('/cityPopSelect')
+
+def cityPopSelect():
+    #selectCity
     # added city selection dropdown
     statequery = \
     """
     SELECT distinct city_name FROM city;
                          
     """
-    header, cities = db.execute(statequery)
-    
+    _, cities = db.execute(statequery)
+    return render_template('cityPopSelect.html', posts = cities)
+
+
+@app.route('/cityPop/<selectCity>')
+
+def cityPop(selectCity):
+    #selectCity
+    # added city selection dropdown
+    statequery = \
+    """
+   SELECT distinct city_name FROM city;
+                         
+    """
+    _, cities = db.execute(statequery)
+    query = \
+        """
+         SELECT city_name, city_population FROM city
+         WHERE city_name =  \'%s\';
+        """
+    header, table = db.execute(query % selectCity)
  
-    return render_template('cityPop.html', posts = cities)   
+    return render_template('cityPop.html', posts = cities, table=table, header=header)   
+
+# @app.route('/cityPop/update/<City>')
+# def cityPopUpdate(cityPopNum, State, City):
+#     #selectCity
+#     # added city selection dropdown
+#     statequery = \
+#     """
+#    SELECT distinct city_name FROM city;
+                         
+#     """
+#     _, cities = db.execute(statequery)
+#     query = \
+#         """
+#        UPDATE city
+#        SET    city_population = \'%a\'
+#        WHERE  state =\'%s\'
+#        AND city_name = \'%c\' 
+#         """
+#     header, table = db.execute(query % (cityPopNum, State, City))
+ 
+#     return render_template('cityPop.html', posts = cities, table=table, header=header)   
+
+
 
 @app.route('/category_report')
 def category_report():
@@ -315,7 +360,9 @@ def highestVol(yr, m):
 def revByPop():
     query = \
     """
-    SELECT *
+    SELECT CAST(year AS VARCHAR(10)), CAST(small AS INT),CAST(medium AS INT),CAST(large AS INT),CAST(extra_large AS INT)
+ FROM
+ (SELECT *
     FROM   crosstab ( 'WITH CityRevenue(year, city_size, revenue) AS (SELECT   year,
             city_size,
             Sum(revenue)AS revenue
@@ -355,7 +402,7 @@ def revByPop():
     GROUP BY year,
             city_size
     ORDER BY year) 
-    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, small DOUBLE PRECISION, medium DOUBLE PRECISION, large DOUBLE PRECISION, extra_large DOUBLE PRECISION);
+    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, small DOUBLE PRECISION, medium DOUBLE PRECISION, large DOUBLE PRECISION, extra_large DOUBLE PRECISION)) a;
     """
     header, table = db.execute(query)
     return render_template('revByPop.html', table=table, header=header)   

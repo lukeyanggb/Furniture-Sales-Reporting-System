@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block nav_there %}active{% endblock %}
 {% block head %}
@@ -36,31 +37,9 @@
 
 <h2>Add Holiday</h2>
 
-<form action = "#" method = "POST">
-    <input type = 'Date' name = "Date" placeholder = "Enter Date" value = "{{Date if Date}}"/>
-    <input type = "submit" value = "submit"/>
-    <input type = 'holiday' name = "holiday" placeholder = "Enter holiday" value = "{{holiday if holiday}}"/>
-    <input type = "submit" value = "submit"/>
-    
-    
-</form>
+<div style="width: 30%">
+    {{ wtf.quick_form(form)}}
+</div>
 
-  <table>
-    <thead>
-      <tr>
-      {% for col in header %}
-        <th>{{ col }}</th>
-      {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-    {% for row in table %}
-      {% for col in row %}
-        <td>{{ col }}</td>
-      {% endfor %}
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
 
 {% endblock %}

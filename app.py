@@ -1,31 +1,95 @@
 from flask import Flask, request, render_template, redirect, url_for
-app = Flask(__name__)
+from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
+from wtforms import StringField, DateField, SubmitField
+from wtforms.fields.html5 import DateField
+from wtforms.validators import DataRequired
 import db
 
+app = Flask(__name__)
+
+Bootstrap(app)
+# Flask-WTF requires an encryption key - the string can be anything
+app.config['SECRET_KEY'] = 'TEAM054_DB6400'
+
+# assign each form control to a unique variable
+class MonthHighestVol(FlaskForm):
+    date = DateField("Pick a date to show the report for that month", format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class HolidayAdd(FlaskForm):
+    date = DateField("Pick a date: ", format='%Y-%m-%d', validators=[DataRequired()])
+    name = StringField('Enter the holiday name', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 @app.route('/')
 def index():
     return render_template('main_menu.html')
 
-@app.route('/holiday')
+@app.route('/holiday', methods=['GET', 'POST'])
 def holiday():
     # header, table = db.execute(query)
-    statequery = \
+    query = \
     """
-   SELECT distinct holiday_name FROM holiday;
+    SELECT distinct holiday_name FROM holiday;
                          
     """
-    header, holidies = db.execute(statequery)
-    
+    _, holidays = db.execute(query)
 
-    return render_template('holiday.html',posts = holidies) 
+    form = HolidayAdd()
+    message = ""
+    if form.validate_on_submit():
+        date = form.date.data
+        year = date.year
+        month = date.month
+        day = date.day
+        name = form.name.data
+        # check if the selected date is holiday or not:
+        query = \
+        """
+        SELECT * FROM holiday WHERE date = '%d-%d-%d';             
+        """
+        _, table = db.execute(query % (year, month, day))
+        print(type(table))
+        print(table)
+        # if no record:
+        if len(table) == 0:
+            query = \
+            """
+            INSERT INTO holiday VALUES ('%d/%d/%d', '%s');             
+            """
+            db.insert(query % (year, month, day, name))
+        # if already has a holiday
+        else:
+            name += table[0][1]
+            query = \
+            """
+            UPDATE holiday SET holiday_name = '%s' WHERE date = '%d/%d/%d';             
+            """
+            db.update(query % (name, year, month, day))
+        return redirect( url_for('holidayShow', yr=year, m=month, d=day))
+    else:
+        message = 'Invalid input.'
+
+    return render_template('holiday.html', posts = holidays, form=form, message=message) 
+
+@app.route('/holiday/<int:yr>/<int:m>/<int:d>')
+def holidayShow(yr, m, d):
+    # header, table = db.execute(query)
+    query = \
+    """
+    SELECT * FROM holiday WHERE date = '%d-%d-%d';             
+    """
+    print(query % (yr, m, d))
+    header, table = db.execute(query % (yr, m, d))
+    return render_template('holidayShow.html', table=table, header=header) 
 
 @app.route('/cityPop')
 def cityPop():
     # added city selection dropdown
     statequery = \
     """
-   SELECT distinct city_name FROM city;
+    SELECT distinct city_name FROM city;
                          
     """
     header, cities = db.execute(statequery)
@@ -159,12 +223,31 @@ def storeRev(selectstate):
     return render_template('storeRev.html', posts = States, table=table, header=header)  
 
 
-@app.route('/highestVolSelect')
+@app.route('/highestVolSelect', methods=['GET', 'POST'])
 def highestVolSelect():
-    return render_template('highestVolSelect.html')
+    form = MonthHighestVol()
+    message = ""
+    if form.validate_on_submit():
+        date = form.date.data
+        month = date.month
+        year = date.year
+        return redirect( url_for('highestVol', yr=year, m=month) )
+    else:
+        message = 'Sorry. There is no record for selected month.'
+    return render_template('highestVolSelect.html', form=form, message=message)
 
-@app.route('/highestVol/<int:yr>/<int:m>')
+@app.route('/highestVol/<int:yr>/<int:m>', methods=['GET', 'POST'])
 def highestVol(yr, m):
+    form = MonthHighestVol()
+    message = ""
+    if form.validate_on_submit():
+        date = form.date.data
+        month = date.month
+        year = date.year
+        return redirect( url_for('highestVol', yr=year, m=month) )
+    else:
+        message='Sorry. There is no record for selected month.'
+    
     query = \
     """
     SELECT category_name,
@@ -208,7 +291,7 @@ def highestVol(yr, m):
     WHERE  rank = 1 
     """
     header, table = db.execute(query % (yr, m)) 
-    return render_template('highestVol.html', table=table, header=header) 
+    return render_template('highestVol.html', table=table, header=header, form=form, message=message) 
 
 
 @app.route('/revByPop')

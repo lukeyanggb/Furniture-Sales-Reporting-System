@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block nav_there %}active{% endblock %}
 {% block head %}
@@ -25,30 +26,8 @@
 {{ super() }}
 
 <h1>State with Highest Volume for Each Category by Month</h1>
-<form onsubmit='submitForm(event)'>
-<div class="container">
-    <div class="col-sm-6" style="height:130px;">
-       <div class="form-group">
-          <div class='input-group date' id='datetimepicker10'>
-             <input type='text' class="form-control" />
-             <span class="input-group-addon">
-             <span class="glyphicon glyphicon-calendar">
-             </span>
-             </span>
-          </div>
-       </div>
-    </div>
-    <script type="text/javascript">
-       $(function () {
-           $('#datetimepicker10').datetimepicker({
-               viewMode: 'months',
-               format: 'MM/YYYY'
-           });
-       });
-    </script>
+<div style="width: 30%">
+    {{ wtf.quick_form(form)}}
 </div>
-</form>
-
-
  
 {% endblock %}

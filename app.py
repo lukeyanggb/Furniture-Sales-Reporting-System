@@ -22,6 +22,11 @@ class HolidayAdd(FlaskForm):
     name = StringField('Enter the holiday name', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+class UpdateCityPopAdd(FlaskForm):
+    updatedCityPop = StringField('Enter the Updated City Pop', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
 @app.route('/')
 def index():
     return render_template('main_menu.html')
@@ -50,6 +55,8 @@ def holiday():
         SELECT * FROM holiday WHERE date = '%d-%d-%d';             
         """
         _, table = db.execute(query % (year, month, day))
+        print(type(table))
+        print(table)
         # if no record:
         if len(table) == 0:
             query = \
@@ -95,6 +102,7 @@ def holidayShowDate(yr, m, d):
     """
     SELECT * FROM holiday WHERE date = '%d-%d-%d';             
     """
+    print(query % (yr, m, d))
     header, table = db.execute(query % (yr, m, d))
     return render_template('holidayShow.html', table=table, header=header) 
 
@@ -104,12 +112,13 @@ def holidayShowDate(yr, m, d):
 def cityPopSelect():
     #selectCity
     # added city selection dropdown
-    statequery = \
+    
+    cityquery = \
     """
     SELECT distinct city_name FROM city;
                          
     """
-    _, cities = db.execute(statequery)
+    _, cities = db.execute(cityquery)
     return render_template('cityPopSelect.html', posts = cities)
 
 
@@ -118,12 +127,12 @@ def cityPopSelect():
 def cityPop(selectCity):
     #selectCity
     # added city selection dropdown
-    statequery = \
+    cityquery = \
     """
    SELECT distinct city_name FROM city;
                          
     """
-    _, cities = db.execute(statequery)
+    _, cities = db.execute(cityquery)
     query = \
         """
          SELECT city_name, city_population FROM city
@@ -131,28 +140,42 @@ def cityPop(selectCity):
         """
     header, table = db.execute(query % selectCity)
  
-    return render_template('cityPop.html', posts = cities, table=table, header=header)   
+    return render_template('cityPop.html', posts = cities, table=table, header=header)  
 
-# @app.route('/cityPop/update/<City>')
-# def cityPopUpdate(cityPopNum, State, City):
-#     #selectCity
-#     # added city selection dropdown
-#     statequery = \
-#     """
-#    SELECT distinct city_name FROM city;
+@app.route('/cityPop/update/<selectCity>', methods=['GET', 'POST'])
+def cityPopUpdate(selectCity):
+    #selectCity
+    # added city selection dropdown
+
+    statequery = \
+    """
+    SELECT distinct city_name FROM city;
                          
-#     """
-#     _, cities = db.execute(statequery)
-#     query = \
-#         """
-#        UPDATE city
-#        SET    city_population = \'%a\'
-#        WHERE  state =\'%s\'
-#        AND city_name = \'%c\' 
-#         """
-#     header, table = db.execute(query % (cityPopNum, State, City))
+     """
+    _, cities = db.execute(statequery)
+
+
+    query = \
+        """
+         SELECT city_name, city_population FROM city
+         WHERE city_name =  \'%s\';
+        """
+    header, table = db.execute(query % selectCity)
+
+    if request.method == 'POST':
+        number = request.form['Population']
+        intnum = int(number)
+        print(type(intnum))
+
+        query = \
+            """
+            UPDATE city
+            SET    city_population = \'%i\'
+            WHERE  city_name = \'%s\' 
+            """
+        header, table = db.execute(query % (intnum, selectCity))
  
-#     return render_template('cityPop.html', posts = cities, table=table, header=header)   
+    return render_template('cityPop.html', posts = cities, table=table, header=header) 
 
 
 

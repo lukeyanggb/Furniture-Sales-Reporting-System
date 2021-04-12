@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block nav_there %}active{% endblock %}
 {% block head %}
@@ -46,7 +47,10 @@
 
 <h4> Enter updated population:</h4>
 <form action = "#" method = "POST">
-    <input type = 'Population' name = "Population" placeholder = "Enter number" value = "{{Population if Population}}"/>
-    <input type = "submit" value = "submit"/>
+    <input type = "number" name = "Population" id = "Population" >
+    <input type = "submit" value = "submit">
+  </form> 
 
-  {% endblock %}
+
+
+{% endblock %}

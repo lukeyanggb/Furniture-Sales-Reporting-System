@@ -1,0 +1,6 @@
+Python
+Flask
+psycopg2
+Flask-WTF
+Flask-Bootstrap4
+WTForms

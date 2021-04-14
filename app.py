@@ -100,21 +100,19 @@ def holidayShowDate(yr, m, d):
 
 
 @app.route('/cityPopSelect')
-
 def cityPopSelect():
     #selectCity
     # added city selection dropdown
     statequery = \
     """
     SELECT distinct city_name FROM city;
-                         
+
     """
     _, cities = db.execute(statequery)
     return render_template('cityPopSelect.html', posts = cities)
 
 
 @app.route('/cityPop/<selectCity>')
-
 def cityPop(selectCity):
     #selectCity
     # added city selection dropdown
@@ -131,28 +129,27 @@ def cityPop(selectCity):
         """
     header, table = db.execute(query % selectCity)
  
-    return render_template('cityPop.html', posts = cities, table=table, header=header)   
+    return render_template('cityPopSelect.html', posts = cities, table=table, header=header)
 
-# @app.route('/cityPop/update/<City>')
-# def cityPopUpdate(cityPopNum, State, City):
-#     #selectCity
-#     # added city selection dropdown
-#     statequery = \
-#     """
-#    SELECT distinct city_name FROM city;
-                         
-#     """
-#     _, cities = db.execute(statequery)
-#     query = \
-#         """
-#        UPDATE city
-#        SET    city_population = \'%a\'
-#        WHERE  state =\'%s\'
-#        AND city_name = \'%c\' 
-#         """
-#     header, table = db.execute(query % (cityPopNum, State, City))
- 
-#     return render_template('cityPop.html', posts = cities, table=table, header=header)   
+@app.route('/cityPopUpdate', methods=["POST"])
+def cityPopUpdate():
+    #selectCity
+    # added city selection dropdown
+
+
+    # *****************************************************************************
+    # city and population number data has been received
+    # you can print data and its types
+
+    City = str(request.form.get("cityoption"))
+    cityPopNum = int(request.form.get("Population"))
+
+    statequery = """ SELECT distinct city_name FROM city """
+    _, cities = db.execute(statequery)
+    query = """ UPDATE city SET city_population = '%d' WHERE  city_name = '%s' """
+    db.insert(query % (cityPopNum, City))
+
+    return render_template('cityPopSelect.html', posts = cities)
 
 
 

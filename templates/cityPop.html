@@ -11,6 +11,7 @@
 
 {% block body %}
 {{ super() }}
+<div style="margin-left: 100px">
 <h1>City Population</h1>
 
 <p></p>
@@ -82,7 +83,7 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         {% for city in posts %}
-        <li><a class="dropdown-item" href="/cityPop/update/{{city[0]}}">{{city[0]}}</a></li>
+        <li><a class="dropdown-item" href="/cityPop/{{city[0]}}">{{city[0]}}</a></li>
     {% endfor%}
 </ul>
   </div>
@@ -93,5 +94,5 @@
     <input type = "submit" value = "submit"/>
   
 </form>
-
+</div>
 {% endblock %}

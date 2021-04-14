@@ -6,5 +6,9 @@
 
 {% block body %}
 {{ super() }}
+<div style="margin-left: 100px">
 <h1>Main Menu</h1>
+
+    <img src="{{ url_for('static', filename='eer.png')}}">
+</div>
 {% endblock %}

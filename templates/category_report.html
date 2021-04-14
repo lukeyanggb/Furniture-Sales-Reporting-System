@@ -7,16 +7,18 @@
 
 {% block body %}
 {{ super() }}
+<div style="margin-left: 100px">
 <h1>Category Report</h1>
 
 <table class="table">
     <thead>
       <tr>
-        
-        {% for col in header %}
-        <th scope="col">{{ col }}</th>
-        
-      {% endfor %}
+        <th>Category Name</th>
+        <th>Count</th>
+        <th>Min</th>
+        <th>Average</th>
+        <th>Max</th>
+  
       </tr>
     </thead>
     <tbody>
@@ -35,5 +37,5 @@
       </tr>
     </tbody>
   </table>
-
+</div>
 {% endblock %}

@@ -4,6 +4,7 @@
 {% block nav_there %}active{% endblock %}
 {% block head %}
 {{ super() }}
+<div style="margin-left: 100px">
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js" />
@@ -26,8 +27,16 @@
 {{ super() }}
 
 <h1>State with Highest Volume for Each Category by Month</h1>
-<div style="width: 30%">
-    {{ wtf.quick_form(form)}}
+<p></p>
+
+<div>
+<form method='post' action='/highestVolSelect'>
+    <lable >Please Select A Month: </lable> <br><br>
+    <input type = "month" name = 'Monthselect'/><br><br>
+    <input type = 'submit'/>
+</form>
 </div>
- 
+
+</div>
+
 {% endblock %}

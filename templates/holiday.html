@@ -12,7 +12,10 @@
 
 {% block body %}
 {{ super() }}
-<h1>Holiday</h1>
+<div style="margin-left: 100px">
+
+  <h1>Holiday</h1>
+
 
 <h2>View Holiday</h2>
 
@@ -23,7 +26,7 @@
           Pick a holiday
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            {% for holiday in posts %}
+            {% for holiday in posts2 %}
             <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
         {% endfor%}
     </ul>
@@ -31,43 +34,18 @@
 
     <p></p>
     <h3> Or select date</h3>
-    <!-- {% for date in posts %} -->
-    <form action = "/holiday/{{date[0]}}" method = "POST">
-        <!-- {% endfor%} -->
-        <input type = 'Date' name = "Date" placeholder = "Enter Date" value = "{{Date if Date}}"/>
-        <input type = "submit" value = "submit"/>
-    </form>
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        Pick a date
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          {% for holidaydate in posts1 %}
+          <li><a class="dropdown-item" href="/holiday/{{holidaydate[0]}}">{{holidaydate[0]}}</a></li>
+      {% endfor%}
+  </ul>
 </div>
 
-<p></p>
-<div>
-    <table class="table">
-        <thead>
-          <tr>
-            
-            {% for col in header %}
-            <th scope="col">{{ col }}</th>
-            
-          {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-      
-            {% for row in table %}     
-         
-                {% for col in row %}
-                     <td>{{ col }}</td>
-                
-                 {% endfor %}
-            </tr>
-          {% endfor %}
-              
-            
-          </tr>
-        </tbody>
-      </table>
-</div>
+
 
 
 <h2>Add Holiday</h2>
@@ -77,4 +55,5 @@
 </div>
 
 
+</div>
 {% endblock %}

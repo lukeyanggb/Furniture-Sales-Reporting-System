@@ -11,6 +11,7 @@
 
 {% block body %}
 {{ super() }}
+<div style="margin-left: 100px">
 <h1>Restaurant Impact</h1>
 
  
@@ -18,10 +19,11 @@
     <thead>
       <tr>
         
-        {% for col in header %}
-        <th scope="col">{{ col }}</th>
+        <th>Category</th>
+          <th>Store type</th>
+          <th>Quantity Sold</th>
         
-      {% endfor %}
+     
       </tr>
     </thead>
     <tbody>
@@ -40,5 +42,6 @@
       </tr>
     </tbody>
   </table>
+</div>
 {% endblock %}
 

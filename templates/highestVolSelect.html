@@ -27,8 +27,16 @@
 {{ super() }}
 
 <h1>State with Highest Volume for Each Category by Month</h1>
-<div style="width: 30%">
-    {{ wtf.quick_form(form)}}
+<p></p>
+
+<div>
+<form method='post' action='/highestVolSelect'>
+    <lable >Please Select A Month: </lable> <br><br>
+    <input type = "month" name = 'Monthselect'/><br><br>
+    <input type = 'submit'/>
+</form>
 </div>
+
 </div>
+
 {% endblock %}

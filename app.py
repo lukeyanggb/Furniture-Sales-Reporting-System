@@ -5,6 +5,7 @@ from wtforms import StringField, DateField, SubmitField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 import db
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -13,6 +14,10 @@ Bootstrap(app)
 app.config['SECRET_KEY'] = 'TEAM054_DB6400'
 
 # assign each form control to a unique variable
+class MonthField(DateField):
+
+    def __init__(self, label=None, validators=None, format="%Y-%m", **kwargs):
+        super().__init__(label, validators, format, **kwargs)
 class MonthHighestVol(FlaskForm):
     date = DateField("Pick a date to show the report for that month", format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Submit')
@@ -21,6 +26,7 @@ class HolidayAdd(FlaskForm):
     date = DateField("Pick a date: ", format='%Y-%m-%d', validators=[DataRequired()])
     name = StringField('Enter the holiday name', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
 
 @app.route('/')
 def index():
@@ -35,8 +41,15 @@ def holiday():
                          
     """
     _, holidays = db.execute(query)
+    query = \
+    """
+    SELECT distinct date FROM holiday;
+                         
+    """
+    _, dates = db.execute(query)
 
     form = HolidayAdd()
+
     message = ""
     if form.validate_on_submit():
         date = form.date.data
@@ -69,34 +82,60 @@ def holiday():
     else:
         message = 'Invalid input.'
 
-    return render_template('holiday.html', posts = holidays, form=form, message=message) 
+    return render_template('holiday.html', posts1 =dates, posts2 = holidays, form=form, message=message) 
 
 @app.route('/holiday/<selecthol>')
 def holidayShowHD(selecthol):
     # header, table = db.execute(query)
-    query = \
-    """
-    SELECT distinct holiday_name FROM holiday;
-                         
-    """
+  
+    query = """SELECT distinct holiday_name FROM holiday;"""
     _, holidays = db.execute(query)
-    # header, table = db.execute(query)
-    holquery = \
-    """
-    SELECT *  FROM holiday WHERE holiday_name =  \'%s\';                   
-    """
-    header, table = db.execute(holquery % selecthol)
-    return render_template('holidayShow.html', posts = holidays, table=table, header=header) 
+
+    query = """SELECT distinct date FROM holiday;"""
+    _, dates = db.execute(query)
+    
+    lable = False 
+
+    for item in holidays:
+        if selecthol in item:
+            lable = True
+        
+    if lable is True:
+        holquery = \
+        """
+        SELECT *  FROM holiday WHERE holiday_name =  \'%s\';                   
+        """
+        header, table = db.execute(holquery % selecthol)
+    
+    else:
+        date = datetime.strptime(selecthol, '%Y-%m-%d')
+        yr = date.year
+        m = date.month 
+        d = date.day
+        query = \
+        """
+        SELECT * FROM holiday WHERE date = '%d-%d-%d';             
+        """
+        header, table = db.execute(query % (yr, m, d))
+
+    return render_template('holidayShow.html', posts1 = dates, posts2 = holidays, table=table, header=header) 
+
+
 
 @app.route('/holiday/<int:yr>/<int:m>/<int:d>')
 def holidayShowDate(yr, m, d):
     # header, table = db.execute(query)
+    query = """SELECT distinct holiday_name FROM holiday;"""
+    _, holidays = db.execute(query)
+
+    query = """SELECT distinct date FROM holiday;"""
+    _, dates = db.execute(query)
     query = \
     """
     SELECT * FROM holiday WHERE date = '%d-%d-%d';             
     """
     header, table = db.execute(query % (yr, m, d))
-    return render_template('holidayShow.html', table=table, header=header) 
+    return render_template('holidayShow.html', posts1 = dates, posts2 = holidays, table=table, header=header) 
 
 
 @app.route('/cityPopSelect')
@@ -149,7 +188,13 @@ def cityPopUpdate():
     query = """ UPDATE city SET city_population = '%d' WHERE  city_name = '%s' """
     db.insert(query % (cityPopNum, City))
 
-    return render_template('cityPopSelect.html', posts = cities)
+    statequery = """SELECT distinct city_name FROM city; """
+    _, cities = db.execute(statequery)
+    query = """SELECT city_name, city_population FROM city
+         WHERE city_name =  \'%s\';"""
+    header, table = db.execute(query % City)
+
+    return render_template('cityPopSelect.html', posts = cities, header = header, table = table)
 
 
 
@@ -281,28 +326,20 @@ def storeRev(selectstate):
 
 @app.route('/highestVolSelect', methods=['GET', 'POST'])
 def highestVolSelect():
-    form = MonthHighestVol()
-    message = ""
-    if form.validate_on_submit():
-        date = form.date.data
-        month = date.month
-        year = date.year
-        return redirect( url_for('highestVol', yr=year, m=month) )
+    selectmonth = request.form.get("Monthselect")
+   
+    if selectmonth is not None:
+        print(selectmonth)
+        date = datetime.strptime(selectmonth, '%Y-%m')
+        yr = date.year
+        m = date.month
+        return redirect( url_for('highestVol', yr=yr, m=m) )
     else:
         message = 'Sorry. There is no record for selected month.'
-    return render_template('highestVolSelect.html', form=form, message=message)
+    return render_template('highestVolSelect.html')
 
 @app.route('/highestVol/<int:yr>/<int:m>', methods=['GET', 'POST'])
 def highestVol(yr, m):
-    form = MonthHighestVol()
-    message = ""
-    if form.validate_on_submit():
-        date = form.date.data
-        month = date.month
-        year = date.year
-        return redirect( url_for('highestVol', yr=year, m=month) )
-    else:
-        message='Sorry. There is no record for selected month.'
     
     query = \
     """
@@ -347,13 +384,14 @@ def highestVol(yr, m):
     WHERE  rank = 1 
     """
     header, table = db.execute(query % (yr, m)) 
-    return render_template('highestVol.html', table=table, header=header, form=form, message=message) 
+    return render_template('highestVol.html', table=table, header=header) 
 
 
 @app.route('/revByPop')
 def revByPop():
     query = \
     """
+    CREATE EXTENSION IF NOT EXISTS tablefunc;
     SELECT CAST(year AS VARCHAR(10)), CAST(small AS INT),CAST(medium AS INT),CAST(large AS INT),CAST(extra_large AS INT)
  FROM
  (SELECT *
@@ -405,6 +443,7 @@ def revByPop():
 def childcare():
     query = \
     """
+    CREATE EXTENSION IF NOT EXISTS tablefunc;
     SELECT   *
     FROM     crosstab ( 
     'WITH aggtable(mon, maximum_time, sum) AS

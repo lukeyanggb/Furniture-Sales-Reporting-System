@@ -22,20 +22,32 @@
           Pick a holiday
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            {% for holiday in posts %}
+            {% for holiday in posts2 %}
             <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
         {% endfor%}
     </ul>
 </div>
 
+<h3>Or select date</h3>
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          Pick a date
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            {% for holidaydate in posts1 %}
+            <li><a class="dropdown-item" href="/holiday/{{holidaydate[0]}}">{{holidaydate[0]}}</a></li>
+        {% endfor%}
+    </ul>
+</div>
+
+
+
   <table class="table">
     <thead>
       <tr>
         
-        {% for col in header %}
-        <th scope="col">{{ col }}</th>
-        
-      {% endfor %}
+        <th>Date</th>
+        <th>Holiday Name</th>
       </tr>
     </thead>
     <tbody>
@@ -54,6 +66,9 @@
       </tr>
     </tbody>
   </table>
+  
+</div>
+
 
 </div>
 

@@ -13,9 +13,11 @@
 {{ super() }}
 <div style="margin-left: 100px">
 <h1>State with Highest Volume for Each Category by Month</h1>
-<div style="width: 30%">
-    {{ wtf.quick_form(form)}}
-</div>
+<form method='post' action='/highestVolSelect'>
+  <lable >Month: </lable> <br><br>
+  <input type = "month" name = 'Monthselect'/><br><br>
+  <input type = 'submit'/>
+</form>
 
 <p></p>
 <p></p>
@@ -24,10 +26,11 @@
     <thead>
       <tr>
         
-        {% for col in header %}
-        <th scope="col">{{ col }}</th>
+        <th>Category Name</th>
+          <th>State</th>
+          <th>Volume</th>
         
-      {% endfor %}
+    
       </tr>
     </thead>
     <tbody>

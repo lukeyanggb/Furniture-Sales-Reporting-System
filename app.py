@@ -138,10 +138,6 @@ def holidayShowDate(yr, m, d):
     return render_template('holidayShow.html', posts1 = dates, posts2 = holidays, table=table, header=header) 
 
 
-
-
-
-
 @app.route('/cityPopSelect')
 def cityPopSelect():
     #selectCity

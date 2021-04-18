@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block body %}
+{{ super() }}
+<div style="margin-left: 100px">
+<h1>Main Menu</h1>
+<div class="table-responsive">
+    
+    <table class="table">
+        <thead>
+          <tr>
+            
+            <th>Count of Store</th>
+            <th>Store that Offers foods</th>
+            <th>Store that Offers Childcare</th>
+            <th>Count of Products</th>
+            <th>Count of Distinct Campaigns</th>
+          
+        
+          
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+      
+            {% for row in table %}     
+         
+                {% for col in row %}
+                     <td>{{ col }}</td>
+                
+                 {% endfor %}
+            </tr>
+          {% endfor %}
+              
+            
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <img width = 600 src="{{ url_for('static', filename='eer.png')}}">
+</div>
+{% endblock %}

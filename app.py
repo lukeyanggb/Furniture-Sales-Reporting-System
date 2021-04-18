@@ -30,7 +30,17 @@ class HolidayAdd(FlaskForm):
 
 @app.route('/')
 def index():
-    return render_template('main_menu.html')
+    query = \
+    """
+    Select (select count(store_number) from store) As count_of_stores,
+    (select count(store_number) from store where restaurant is True or snack_bar is true) AS store_that_offers_food,
+    (select count(store_number) from store where maximum_time is not null) AS store_that_offers_childCare,
+    (select count(productid) from product) AS count_of_products,
+    (select count(campaign_description) from campaign) As count_of_distinct_campaigns;
+    """
+    header,table = db.execute(query)
+    return render_template('main_menu.html', header = header, table = table)
+   
 
 @app.route('/holiday', methods=['GET', 'POST'])
 def holiday():
@@ -144,7 +154,7 @@ def cityPopSelect():
     # added city selection dropdown
     statequery = \
     """
-    SELECT distinct city_name FROM city;
+    SELECT  distinct(state, city_name) FROM city;
 
     """
     _, cities = db.execute(statequery)
@@ -155,20 +165,29 @@ def cityPopSelect():
 def cityPop(selectCity):
     #selectCity
     # added city selection dropdown
+    stateandcity =selectCity.split(',')
+    state = stateandcity[0][1::]
+    city = stateandcity[1][0:-1]
+    if city[0]=='\"':
+        city = city[1:-1]
+    print(state)
+    print(city)
+    
     statequery = \
     """
-   SELECT distinct city_name FROM city;
+    SELECT distinct(state, city_name) FROM city;
                          
     """
     _, cities = db.execute(statequery)
     query = \
         """
-         SELECT city_name, city_population FROM city
-         WHERE city_name =  \'%s\';
+         SELECT state, city_name, city_population FROM city
+         WHERE state =  \'%s\' and city_name =  \'%s\';
         """
-    header, table = db.execute(query % selectCity)
+    header, table = db.execute(query % (state, city))
  
     return render_template('cityPopSelect.html', posts = cities, table=table, header=header)
+
 
 @app.route('/cityPopUpdate', methods=["POST"])
 def cityPopUpdate():
@@ -180,19 +199,34 @@ def cityPopUpdate():
     # city and population number data has been received
     # you can print data and its types
 
-    City = str(request.form.get("cityoption"))
+    selectCity = str(request.form.get("cityoption"))
     cityPopNum = int(request.form.get("Population"))
+    stateandcity =selectCity.split(',')
+    state = stateandcity[0][1::]
+    city = stateandcity[1][0:-1]
+    if city[0]=='\"':
+        city = city[1:-1]
 
-    statequery = """ SELECT distinct city_name FROM city """
+    statequery = \
+    """
+    SELECT distinct(state, city_name) FROM city;
+                         
+    """
     _, cities = db.execute(statequery)
-    query = """ UPDATE city SET city_population = '%d' WHERE  city_name = '%s' """
-    db.insert(query % (cityPopNum, City))
 
-    statequery = """SELECT distinct city_name FROM city; """
+    query = """ UPDATE city SET city_population = '%d' WHERE  state = '%s' and city_name = '%s' """
+    db.insert(query % (cityPopNum, state, city))
+
+    statequery = \
+    """
+    SELECT distinct(state, city_name) FROM city;
+                         
+    """
     _, cities = db.execute(statequery)
-    query = """SELECT city_name, city_population FROM city
-         WHERE city_name =  \'%s\';"""
-    header, table = db.execute(query % City)
+
+    query = """SELECT state, city_name, city_population FROM city
+         WHERE state = '%s' and city_name = '%s';"""
+    header, table = db.execute(query % (state, city))
 
     return render_template('cityPopSelect.html', posts = cities, header = header, table = table)
 
@@ -226,46 +260,29 @@ def category_report():
 def couacheSofas():
     query = \
     """
-    SELECT Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
-                                                        WHEN (
-              d.productid = p.productid
-              AND d.date = t.date ) THEN d.discount_price
-                                                        ELSE p.regular_price
-                                                      END ) * quantity) AS
-       difference,
-       p.product_name                                                   AS
-       product_name,
-       p.productid                                                      AS
-       product_ID,
-       p.regular_price                                                  AS
-       retail_price,
-       Sum(t.quantity)                                                  AS
-       total_quantity
-    FROM   TRANSACTION AS t
-        LEFT JOIN product AS p
-                ON t.productid = p.productid
-        LEFT JOIN discount AS d
-                ON d.productid = p.productid
-        LEFT JOIN incategory AS ic
-                ON ic.category_name = 'Couches'
-                    OR ic.category_name = 'Sofas'
-    GROUP  BY p.product_name,
-            p.productid
-    HAVING Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
-                                                            WHEN (
-                d.productid = p.productid
-                AND d.date = t.date ) THEN d.discount_price
-                                                            ELSE p.regular_price
-                                                        END ) * quantity) < -5000
-            OR Sum(p.regular_price * quantity * 0.75) - Sum((
-                CASE
-                WHEN ( d.productid =
-                        p.productid
-                        AND d.date = t.date ) THEN d.discount_price
-                ELSE p.regular_price
-                                                            END ) * quantity) >
-            5000
-    ORDER  BY difference DESC; 
+    SELECT a.year, 
+    Totalnumber_for_a_whole_year,
+    avenumber, 
+    groundhognum 
+    FROM (SELECT Extract(year FROM t.date) AS Year,
+    Sum(quantity) As Totalnumber_for_a_whole_year,
+    Sum(quantity) * 1.0 / 365 AS AveNumber 
+    FROM TRANSACTION AS t 
+    natural JOIN product 
+    natural JOIN incategory 
+    WHERE productid IN (SELECT productid 
+    FROM incategory 
+    WHERE category_name = 'Outdoor Furniture') 
+    GROUP BY year 
+    ORDER BY year) a 
+    LEFT JOIN (SELECT Sum(quantity) AS Groundhognum, 
+    Extract(year FROM date) AS year 
+    FROM TRANSACTION 
+    WHERE Extract(month FROM date) = 2 
+    AND Extract(day FROM date) = 2 
+    GROUP BY date 
+    ORDER BY Extract(year FROM date)) b 
+    ON a.year = b.year; 
     """
     header, table = db.execute(query)
     return render_template('sofa.html', table=table, header=header)   
@@ -497,29 +514,29 @@ def restaurant():
     query = \
     """
     SELECT category,
-       CASE
-         WHEN store_type IS NULL THEN 'Non-Restaurant'
-         ELSE store_type
-       end AS Store_Type,
-       quantity_sold
-    FROM   (SELECT category_name AS Category,
-                CASE
-                    WHEN restaurant IS TRUE THEN 'Restaurant'
-                end           AS Store_Type,
-                Sum(quantity) AS Quantity_Sold
-            FROM   incategory
-                LEFT JOIN(SELECT restaurant,
-                                    store.store_number,
-                                    quantity,
-                                    productid
-                            FROM   store
-                                    INNER JOIN transaction
-                                            ON store.store_number =
-                                            transaction.store_number) a
-                        ON incategory.productid = a.productid
-            GROUP  BY category_name,
-                    restaurant
-            ORDER  BY category_name) a; 
+        CASE
+            WHEN store_type IS NULL THEN 'Non-Restaurant'
+            ELSE store_type
+        end AS Store_Type,
+        quantity_sold
+        FROM   (SELECT category_name AS Category,
+                    CASE
+                        WHEN restaurant = 1 THEN 'Restaurant'
+                    end           AS Store_Type,
+                    Sum(quantity) AS Quantity_Sold
+                FROM   incategory
+                    LEFT JOIN(SELECT restaurant,
+                                        store.store_number,
+                                        quantity,
+                                        productid
+                                FROM   store
+                                        INNER JOIN transaction
+                                                ON store.store_number =
+                                                transaction.store_number) a
+                            ON incategory.productid = a.productid
+                GROUP  BY category_name,
+                        restaurant
+                ORDER  BY category_name) a;
     """
     header, table = db.execute(query)
     return render_template('restaurant.html', table=table, header=header)  
@@ -528,97 +545,46 @@ def restaurant():
 def campaign():
     query = \
     """
-    (SELECT b.productid,
-            product_name,
-            Sum(inside)                AS sold_during_campaign,
-            Sum(outside)               AS sold_outside_campaign,
-            Sum(inside) - Sum(outside) AS difference
-    FROM   (SELECT Max(CASE
-                        WHEN camp = 'inside' THEN quantity
-                        ELSE 0
-                        end) AS inside,
-                    Max(CASE
-                        WHEN camp = 'outside' THEN quantity
-                        ELSE 0
-                        end) AS outside,
-                    productid,
-                    a.date
-            FROM   (SELECT CASE
-                            WHEN transaction.date BETWEEN
-                                a.start_date AND a.end_date THEN
-                            'inside'
-                            ELSE 'outside'
-                            end              AS camp,
-                            productid,
-                            transaction.date AS date,
-                            quantity
-                    FROM   transaction
-                            LEFT JOIN (SELECT date,
-                                            start_date,
-                                            end_date
-                                    FROM   belongto
-                            INNER JOIN campaign
-                                    ON belongto.campaign_description =
-                                    campaign.campaign_description) a
-                                ON transaction.date = a.date) AS a
-            GROUP  BY productid,
-                    camp,
-                    a.date) b
-            LEFT JOIN product
-                ON b.productid = product.productid
-    GROUP  BY b.productid,
-            product_name
-    ORDER  BY difference DESC
-    -- our dummy data can only show top 2 and bottom 2 due to limited number of data
-    -- if using our data to run please change the LIMIT from 10 to 2.
-    LIMIT  10)
+    (select productid, product_name,totalincampaign, totaloutcampaign,(totalincampaign - totaloutcampaign) as difference from
+    (select totalincampaign, totaloutcampaign, productid, (totalincampaign - totaloutcampaign) as difference
+        from
+        (select productid, sum(quantity) as totalincampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date in (select date from campaign)
+        order by productid) as a
+        group by productid) as n natural join
+        (select productid, sum(quantity) as totaloutcampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date not in (select date from campaign)
+        order by productid) as a
+        group by productid) as m) as x natural join product
+    order by difference DESC
+    LIMIT 10)
     UNION
-    (SELECT b.productid,
-            product_name,
-            Sum(inside)                AS sold_during_campaign,
-            Sum(outside)               AS sold_outside_campaign,
-            Sum(inside) - Sum(outside) AS difference
-    FROM   (SELECT Max(CASE
-                        WHEN camp = 'inside' THEN quantity
-                        ELSE 0
-                        end) AS inside,
-                    Max(CASE
-                        WHEN camp = 'outside' THEN quantity
-                        ELSE 0
-                        end) AS outside,
-                    productid,
-                    a.date
-            FROM   (SELECT CASE
-                            WHEN transaction.date BETWEEN
-                                a.start_date AND a.end_date THEN
-                            'inside'
-                            ELSE 'outside'
-                            end              AS camp,
-                            productid,
-                            transaction.date AS date,
-                            quantity
-                    FROM   transaction
-                            LEFT JOIN (SELECT date,
-                                            start_date,
-                                            end_date,
-                                            campaign.campaign_description
-                                    FROM   belongto
-                            INNER JOIN campaign
-                                    ON belongto.campaign_description =
-                                    campaign.campaign_description) a
-                                ON transaction.date = a.date) AS a
-            GROUP  BY productid,
-                    camp,
-                    a.date) b
-            LEFT JOIN product
-                ON b.productid = product.productid
-    GROUP  BY b.productid,
-            product_name
-    ORDER  BY difference ASC
-    -- our dummy data can only show top 2 and bottom 2 due to limited number of data
-    -- if using our data to run please change the LIMIT from 10 to 2.
-    LIMIT  10)
-    ORDER  BY difference DESC; 
+    (select productid, product_name,totalincampaign, totaloutcampaign,(totalincampaign - totaloutcampaign) as difference from
+    (select totalincampaign, totaloutcampaign, productid, (totalincampaign - totaloutcampaign) as difference
+        from
+        (select productid, sum(quantity) as totalincampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date in (select date from campaign)
+        order by productid) as a
+        group by productid) as n natural join
+        (select productid, sum(quantity) as totaloutcampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date not in (select date from campaign)
+        order by productid) as a
+        group by productid) as m) as x natural join product
+    order by difference ASC
+    LIMIT 10)
+    ORDER BY difference DESC;
     """
     header, table = db.execute(query)
     return render_template('campaign.html', table=table, header=header)

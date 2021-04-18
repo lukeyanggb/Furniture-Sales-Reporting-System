@@ -438,7 +438,7 @@ def revByPop():
     GROUP BY year,
             city_size
     ORDER BY year) 
-    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, small DOUBLE PRECISION, medium DOUBLE PRECISION, large DOUBLE PRECISION, extra_large DOUBLE PRECISION)) a;
+    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, extra_large DOUBLE PRECISION, large DOUBLE PRECISION, medium DOUBLE PRECISION, small DOUBLE PRECISION)) a;
     """
     header, table = db.execute(query)
     return render_template('revByPop.html', table=table, header=header)   
@@ -467,7 +467,6 @@ def childcare():
                         ON T.productID = P.productID
                         WHERE T.date >= 
                         date_trunc(''month'', date ''2012-07-01'') - INTERVAL ''1 year'') AS Price
-
                     LEFT JOIN Store 
                     ON Price.store_number = Store.store_number) AS PriceChild
                 LEFT JOIN Discount AS D

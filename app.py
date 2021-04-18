@@ -14,10 +14,6 @@ Bootstrap(app)
 app.config['SECRET_KEY'] = 'TEAM054_DB6400'
 
 # assign each form control to a unique variable
-class MonthField(DateField):
-
-    def __init__(self, label=None, validators=None, format="%Y-%m", **kwargs):
-        super().__init__(label, validators, format, **kwargs)
 class MonthHighestVol(FlaskForm):
     date = DateField("Pick a date to show the report for that month", format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Submit')
@@ -30,7 +26,17 @@ class HolidayAdd(FlaskForm):
 
 @app.route('/')
 def index():
-    return render_template('main_menu.html')
+    query = \
+    """
+    Select (select count(store_number) from store) As count_of_stores,
+    (select count(store_number) from store where restaurant is True or snack_bar is true) AS store_that_offers_food,
+    (select count(store_number) from store where maximum_time is not null) AS store_that_offers_childCare,
+    (select count(productid) from product) AS count_of_products,
+    (select count(campaign_description) from campaign) As count_of_distinct_campaigns;
+    """
+    header,table = db.execute(query)
+    return render_template('main_menu.html', header = header, table = table)
+   
 
 @app.route('/holiday', methods=['GET', 'POST'])
 def holiday():
@@ -97,6 +103,9 @@ def holidayShowHD(selecthol):
     for item in holidays:
         if selecthol in item:
             lable = True
+            if selecthol.find("'") != -1:
+                index = selecthol.find("'")
+                selecthol = selecthol[:index] + "'" + selecthol[index:]
         
     if lable is True:
         holquery = \
@@ -142,7 +151,7 @@ def cityPopSelect():
     # added city selection dropdown
     statequery = \
     """
-    SELECT distinct city_name FROM city;
+    SELECT  distinct(state, city_name) FROM city;
 
     """
     _, cities = db.execute(statequery)
@@ -153,20 +162,29 @@ def cityPopSelect():
 def cityPop(selectCity):
     #selectCity
     # added city selection dropdown
+    stateandcity =selectCity.split(',')
+    state = stateandcity[0][1::]
+    city = stateandcity[1][0:-1]
+    if city[0]=='\"':
+        city = city[1:-1]
+    print(state)
+    print(city)
+    
     statequery = \
     """
-   SELECT distinct city_name FROM city;
+    SELECT distinct(state, city_name) FROM city;
                          
     """
     _, cities = db.execute(statequery)
     query = \
         """
-         SELECT city_name, city_population FROM city
-         WHERE city_name =  \'%s\';
+         SELECT state, city_name, city_population FROM city
+         WHERE state =  \'%s\' and city_name =  \'%s\';
         """
-    header, table = db.execute(query % selectCity)
+    header, table = db.execute(query % (state, city))
  
     return render_template('cityPopSelect.html', posts = cities, table=table, header=header)
+
 
 @app.route('/cityPopUpdate', methods=["POST"])
 def cityPopUpdate():
@@ -178,19 +196,34 @@ def cityPopUpdate():
     # city and population number data has been received
     # you can print data and its types
 
-    City = str(request.form.get("cityoption"))
+    selectCity = str(request.form.get("cityoption"))
     cityPopNum = int(request.form.get("Population"))
+    stateandcity =selectCity.split(',')
+    state = stateandcity[0][1::]
+    city = stateandcity[1][0:-1]
+    if city[0]=='\"':
+        city = city[1:-1]
 
-    statequery = """ SELECT distinct city_name FROM city """
+    statequery = \
+    """
+    SELECT distinct(state, city_name) FROM city;
+                         
+    """
     _, cities = db.execute(statequery)
-    query = """ UPDATE city SET city_population = '%d' WHERE  city_name = '%s' """
-    db.insert(query % (cityPopNum, City))
 
-    statequery = """SELECT distinct city_name FROM city; """
+    query = """ UPDATE city SET city_population = '%d' WHERE  state = '%s' and city_name = '%s' """
+    db.insert(query % (cityPopNum, state, city))
+
+    statequery = \
+    """
+    SELECT distinct(state, city_name) FROM city;
+                         
+    """
     _, cities = db.execute(statequery)
-    query = """SELECT city_name, city_population FROM city
-         WHERE city_name =  \'%s\';"""
-    header, table = db.execute(query % City)
+
+    query = """SELECT state, city_name, city_population FROM city
+         WHERE state = '%s' and city_name = '%s';"""
+    header, table = db.execute(query % (state, city))
 
     return render_template('cityPopSelect.html', posts = cities, header = header, table = table)
 
@@ -224,46 +257,29 @@ def category_report():
 def couacheSofas():
     query = \
     """
-    SELECT Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
-                                                        WHEN (
-              d.productid = p.productid
-              AND d.date = t.date ) THEN d.discount_price
-                                                        ELSE p.regular_price
-                                                      END ) * quantity) AS
-       difference,
-       p.product_name                                                   AS
-       product_name,
-       p.productid                                                      AS
-       product_ID,
-       p.regular_price                                                  AS
-       retail_price,
-       Sum(t.quantity)                                                  AS
-       total_quantity
-    FROM   TRANSACTION AS t
-        LEFT JOIN product AS p
-                ON t.productid = p.productid
-        LEFT JOIN discount AS d
-                ON d.productid = p.productid
-        LEFT JOIN incategory AS ic
-                ON ic.category_name = 'Couches'
-                    OR ic.category_name = 'Sofas'
-    GROUP  BY p.product_name,
-            p.productid
-    HAVING Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
-                                                            WHEN (
-                d.productid = p.productid
-                AND d.date = t.date ) THEN d.discount_price
-                                                            ELSE p.regular_price
-                                                        END ) * quantity) < -5000
-            OR Sum(p.regular_price * quantity * 0.75) - Sum((
-                CASE
-                WHEN ( d.productid =
-                        p.productid
-                        AND d.date = t.date ) THEN d.discount_price
-                ELSE p.regular_price
-                                                            END ) * quantity) >
-            5000
-    ORDER  BY difference DESC; 
+    SELECT a.year, 
+    Totalnumber_for_a_whole_year,
+    avenumber, 
+    groundhognum 
+    FROM (SELECT Extract(year FROM t.date) AS Year,
+    Sum(quantity) As Totalnumber_for_a_whole_year,
+    Sum(quantity) * 1.0 / 365 AS AveNumber 
+    FROM TRANSACTION AS t 
+    natural JOIN product 
+    natural JOIN incategory 
+    WHERE productid IN (SELECT productid 
+    FROM incategory 
+    WHERE category_name = 'Outdoor Furniture') 
+    GROUP BY year 
+    ORDER BY year) a 
+    LEFT JOIN (SELECT Sum(quantity) AS Groundhognum, 
+    Extract(year FROM date) AS year 
+    FROM TRANSACTION 
+    WHERE Extract(month FROM date) = 2 
+    AND Extract(day FROM date) = 2 
+    GROUP BY date 
+    ORDER BY Extract(year FROM date)) b 
+    ON a.year = b.year; 
     """
     header, table = db.execute(query)
     return render_template('sofa.html', table=table, header=header)   

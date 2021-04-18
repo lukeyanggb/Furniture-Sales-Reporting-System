@@ -14,10 +14,6 @@ Bootstrap(app)
 app.config['SECRET_KEY'] = 'TEAM054_DB6400'
 
 # assign each form control to a unique variable
-class MonthField(DateField):
-
-    def __init__(self, label=None, validators=None, format="%Y-%m", **kwargs):
-        super().__init__(label, validators, format, **kwargs)
 class MonthHighestVol(FlaskForm):
     date = DateField("Pick a date to show the report for that month", format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Submit')
@@ -109,6 +105,9 @@ def holidayShowHD(selecthol):
     for item in holidays:
         if selecthol in item:
             lable = True
+            if selecthol.find("'") != -1:
+                index = selecthol.find("'")
+                selecthol = selecthol[:index] + "'" + selecthol[index:]
         
     if lable is True:
         holquery = \

@@ -497,29 +497,29 @@ def restaurant():
     query = \
     """
     SELECT category,
-       CASE
-         WHEN store_type IS NULL THEN 'Non-Restaurant'
-         ELSE store_type
-       end AS Store_Type,
-       quantity_sold
-    FROM   (SELECT category_name AS Category,
-                CASE
-                    WHEN restaurant IS TRUE THEN 'Restaurant'
-                end           AS Store_Type,
-                Sum(quantity) AS Quantity_Sold
-            FROM   incategory
-                LEFT JOIN(SELECT restaurant,
-                                    store.store_number,
-                                    quantity,
-                                    productid
-                            FROM   store
-                                    INNER JOIN transaction
-                                            ON store.store_number =
-                                            transaction.store_number) a
-                        ON incategory.productid = a.productid
-            GROUP  BY category_name,
-                    restaurant
-            ORDER  BY category_name) a; 
+        CASE
+            WHEN store_type IS NULL THEN 'Non-Restaurant'
+            ELSE store_type
+        end AS Store_Type,
+        quantity_sold
+        FROM   (SELECT category_name AS Category,
+                    CASE
+                        WHEN restaurant = 1 THEN 'Restaurant'
+                    end           AS Store_Type,
+                    Sum(quantity) AS Quantity_Sold
+                FROM   incategory
+                    LEFT JOIN(SELECT restaurant,
+                                        store.store_number,
+                                        quantity,
+                                        productid
+                                FROM   store
+                                        INNER JOIN transaction
+                                                ON store.store_number =
+                                                transaction.store_number) a
+                            ON incategory.productid = a.productid
+                GROUP  BY category_name,
+                        restaurant
+                ORDER  BY category_name) a;
     """
     header, table = db.execute(query)
     return render_template('restaurant.html', table=table, header=header)  
@@ -528,97 +528,46 @@ def restaurant():
 def campaign():
     query = \
     """
-    (SELECT b.productid,
-            product_name,
-            Sum(inside)                AS sold_during_campaign,
-            Sum(outside)               AS sold_outside_campaign,
-            Sum(inside) - Sum(outside) AS difference
-    FROM   (SELECT Max(CASE
-                        WHEN camp = 'inside' THEN quantity
-                        ELSE 0
-                        end) AS inside,
-                    Max(CASE
-                        WHEN camp = 'outside' THEN quantity
-                        ELSE 0
-                        end) AS outside,
-                    productid,
-                    a.date
-            FROM   (SELECT CASE
-                            WHEN transaction.date BETWEEN
-                                a.start_date AND a.end_date THEN
-                            'inside'
-                            ELSE 'outside'
-                            end              AS camp,
-                            productid,
-                            transaction.date AS date,
-                            quantity
-                    FROM   transaction
-                            LEFT JOIN (SELECT date,
-                                            start_date,
-                                            end_date
-                                    FROM   belongto
-                            INNER JOIN campaign
-                                    ON belongto.campaign_description =
-                                    campaign.campaign_description) a
-                                ON transaction.date = a.date) AS a
-            GROUP  BY productid,
-                    camp,
-                    a.date) b
-            LEFT JOIN product
-                ON b.productid = product.productid
-    GROUP  BY b.productid,
-            product_name
-    ORDER  BY difference DESC
-    -- our dummy data can only show top 2 and bottom 2 due to limited number of data
-    -- if using our data to run please change the LIMIT from 10 to 2.
-    LIMIT  10)
+    (select productid, product_name,totalincampaign, totaloutcampaign,(totalincampaign - totaloutcampaign) as difference from
+    (select totalincampaign, totaloutcampaign, productid, (totalincampaign - totaloutcampaign) as difference
+        from
+        (select productid, sum(quantity) as totalincampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date in (select date from campaign)
+        order by productid) as a
+        group by productid) as n natural join
+        (select productid, sum(quantity) as totaloutcampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date not in (select date from campaign)
+        order by productid) as a
+        group by productid) as m) as x natural join product
+    order by difference DESC
+    LIMIT 10)
     UNION
-    (SELECT b.productid,
-            product_name,
-            Sum(inside)                AS sold_during_campaign,
-            Sum(outside)               AS sold_outside_campaign,
-            Sum(inside) - Sum(outside) AS difference
-    FROM   (SELECT Max(CASE
-                        WHEN camp = 'inside' THEN quantity
-                        ELSE 0
-                        end) AS inside,
-                    Max(CASE
-                        WHEN camp = 'outside' THEN quantity
-                        ELSE 0
-                        end) AS outside,
-                    productid,
-                    a.date
-            FROM   (SELECT CASE
-                            WHEN transaction.date BETWEEN
-                                a.start_date AND a.end_date THEN
-                            'inside'
-                            ELSE 'outside'
-                            end              AS camp,
-                            productid,
-                            transaction.date AS date,
-                            quantity
-                    FROM   transaction
-                            LEFT JOIN (SELECT date,
-                                            start_date,
-                                            end_date,
-                                            campaign.campaign_description
-                                    FROM   belongto
-                            INNER JOIN campaign
-                                    ON belongto.campaign_description =
-                                    campaign.campaign_description) a
-                                ON transaction.date = a.date) AS a
-            GROUP  BY productid,
-                    camp,
-                    a.date) b
-            LEFT JOIN product
-                ON b.productid = product.productid
-    GROUP  BY b.productid,
-            product_name
-    ORDER  BY difference ASC
-    -- our dummy data can only show top 2 and bottom 2 due to limited number of data
-    -- if using our data to run please change the LIMIT from 10 to 2.
-    LIMIT  10)
-    ORDER  BY difference DESC; 
+    (select productid, product_name,totalincampaign, totaloutcampaign,(totalincampaign - totaloutcampaign) as difference from
+    (select totalincampaign, totaloutcampaign, productid, (totalincampaign - totaloutcampaign) as difference
+        from
+        (select productid, sum(quantity) as totalincampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date in (select date from campaign)
+        order by productid) as a
+        group by productid) as n natural join
+        (select productid, sum(quantity) as totaloutcampaign
+        from(
+        select *
+        from transaction natural join discount
+        where date not in (select date from campaign)
+        order by productid) as a
+        group by productid) as m) as x natural join product
+    order by difference ASC
+    LIMIT 10)
+    ORDER BY difference DESC;
     """
     header, table = db.execute(query)
     return render_template('campaign.html', table=table, header=header)

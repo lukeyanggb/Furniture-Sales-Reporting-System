@@ -233,11 +233,11 @@ def cityPopUpdate():
 def category_report():
     query = \
     """
-    SELECT G.category_name,
-        Count(*),
-        Min(G.regular_price),
-        Avg(G.regular_price),
-        Max(G.regular_price)
+    SELECT G.category_name as cat_name,
+        Count(*) as count,
+        Min(G.regular_price) as min,
+        cast(Avg(G.regular_price) as DECIMAL(9,2)) as avg,
+        Max(G.regular_price) as max
     FROM   (SELECT T.category_name,
                 P.regular_price
             FROM   (SELECT C.category_name,
@@ -257,13 +257,13 @@ def category_report():
 def couacheSofas():
     query = \
     """
-    SELECT a.year, 
+    SELECT cast(a.year as int), 
     Totalnumber_for_a_whole_year,
     avenumber, 
     groundhognum 
     FROM (SELECT Extract(year FROM t.date) AS Year,
     Sum(quantity) As Totalnumber_for_a_whole_year,
-    Sum(quantity) * 1.0 / 365 AS AveNumber 
+    round(Sum(quantity) * 1.0 / 365, 2) AS AveNumber 
     FROM TRANSACTION AS t 
     natural JOIN product 
     natural JOIN incategory 
@@ -313,12 +313,12 @@ def storeRev(selectstate):
     SELECT s.store_number,
     address,
     city_name,
-    Extract(year FROM t.date) AS Year,
-    Sum(quantity * ( CASE
+    cast(Extract(year FROM t.date) as integer) AS Year,
+    round(Sum(quantity * ( CASE
                         WHEN d.discount_price IS NULL THEN regular_price
                         WHEN d.discount_price IS NOT NULL THEN
                         d.discount_price
-                        END ))   AS Revenue
+                        END )))  AS Revenue
     FROM   store AS s
         natural JOIN city
         natural JOIN TRANSACTION AS t
@@ -458,7 +458,7 @@ def childcare():
     query = \
     """
     CREATE EXTENSION IF NOT EXISTS tablefunc;
-    SELECT   *
+    SELECT  mon, round(no_childcare) as no_childcare, round(max_15) as max_15, round(max_30) as max_30,round(max_60) as max_60
     FROM     crosstab ( 
     'WITH aggtable(mon, maximum_time, sum) AS
             (SELECT Sales.mon, Sales.maximum_time, SUM(Sales.revenue) 

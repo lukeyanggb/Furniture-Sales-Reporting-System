@@ -20,7 +20,7 @@ Run the following commands on terminal:
 git clone https://github.gatech.edu/cs6400-2021-01-spring/cs6400-2021-01-Team054.git
 cd cs6400-2021-01-Team054
 pip install -r requirements.txt
-psql -f SchemaAndDummyData.sql
+psql -f SchemaAndDemoData.sql
 python3 app.py
 ```
 

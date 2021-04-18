@@ -37,14 +37,12 @@ def holiday():
     # header, table = db.execute(query)
     query = \
     """
-    SELECT distinct holiday_name FROM holiday;
-                         
+    SELECT distinct holiday_name FROM holiday;                          
     """
     _, holidays = db.execute(query)
     query = \
     """
-    SELECT distinct date FROM holiday;
-                         
+    SELECT distinct date FROM holiday;                   
     """
     _, dates = db.execute(query)
 
@@ -462,7 +460,7 @@ def childcare():
                         LEFT JOIN Product AS P
                         ON T.productID = P.productID
                         WHERE T.date >= 
-                        date_trunc(''month'', CURRENT_DATE) - INTERVAL ''1 year'') AS Price
+                        date_trunc(''month'', date ''2012-07-01'') - INTERVAL ''1 year'') AS Price
 
                     LEFT JOIN Store 
                     ON Price.store_number = Store.store_number) AS PriceChild

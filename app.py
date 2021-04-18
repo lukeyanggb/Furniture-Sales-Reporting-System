@@ -405,20 +405,13 @@ def highestVol(yr, m):
 def revByPop():
     query = \
     """
-    CREATE EXTENSION IF NOT EXISTS tablefunc;
     SELECT CAST(year AS VARCHAR(10)), CAST(small AS INT),CAST(medium AS INT),CAST(large AS INT),CAST(extra_large AS INT)
  FROM
  (SELECT *
     FROM   crosstab ( 'WITH CityRevenue(year, city_size, revenue) AS (SELECT   year,
             city_size,
             Sum(revenue)AS revenue
-    FROM    (
-                    SELECT year,
-                        city_name,
-                        state,
-                        revenue
-                    FROM  (
-                                    SELECT    Extract(year FROM t.date) AS year,
+    FROM    (  SELECT    Extract(year FROM t.date) AS year,
                                             store_number,
                                             quantity*(
                                             CASE
@@ -431,11 +424,8 @@ def revByPop():
                                     AND       t.date=d.date
                                     LEFT JOIN product AS p
                                     ON        p.productid=t.productid )AS a natural
-                    JOIN   city                                         AS c) AS f natural
-    JOIN
-            (
-                    SELECT city_name,
-                        state,
+    JOIN(SELECT store_number,city_size FROM
+            (SELECT city_name,state,
                         CASE
                                 WHEN city_population<3700000 THEN ''small''
                                 WHEN city_population>=3700000
@@ -444,7 +434,7 @@ def revByPop():
                                 AND    city_population<9000000 THEN ''large''
                                 WHEN city_population>=9000000 THEN ''extra_large''
                         END AS city_size
-                    FROM   city) AS c
+                    FROM   city) AS c natural JOIN store AS a) AS p
     GROUP BY year,
             city_size
     ORDER BY year) 

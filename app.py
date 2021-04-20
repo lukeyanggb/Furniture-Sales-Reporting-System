@@ -77,6 +77,7 @@ def holiday():
         # if already has a holiday
         else:
             name += table[0][1]
+            name = name.replace("'", "''")
             query = \
             """
             UPDATE holiday SET holiday_name = '%s' WHERE date = '%d/%d/%d';             

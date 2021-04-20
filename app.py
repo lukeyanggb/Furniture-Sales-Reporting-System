@@ -29,7 +29,7 @@ def index():
     query = \
     """
     Select (select count(store_number) from store) As count_of_stores,
-    (select count(store_number) from store where restaurant is True or snack_bar is true) AS store_that_offers_food,
+    (select count(store_number) from store where restaurant = 1 or snack_bar = 1) AS store_that_offers_food,
     (select count(store_number) from store where maximum_time is not null) AS store_that_offers_childCare,
     (select count(productid) from product) AS count_of_products,
     (select count(campaign_description) from campaign) As count_of_distinct_campaigns;
@@ -43,14 +43,12 @@ def holiday():
     # header, table = db.execute(query)
     query = \
     """
-    SELECT distinct holiday_name FROM holiday;
-                         
+    SELECT distinct holiday_name FROM holiday;                          
     """
     _, holidays = db.execute(query)
     query = \
     """
-    SELECT distinct date FROM holiday;
-                         
+    SELECT distinct date FROM holiday;                   
     """
     _, dates = db.execute(query)
 
@@ -235,11 +233,11 @@ def cityPopUpdate():
 def category_report():
     query = \
     """
-    SELECT G.category_name,
-        Count(*),
-        Min(G.regular_price),
-        Avg(G.regular_price),
-        Max(G.regular_price)
+    SELECT G.category_name as cat_name,
+        Count(*) as count,
+        Min(G.regular_price) as min,
+        cast(Avg(G.regular_price) as DECIMAL(9,2)) as avg,
+        Max(G.regular_price) as max
     FROM   (SELECT T.category_name,
                 P.regular_price
             FROM   (SELECT C.category_name,
@@ -259,13 +257,13 @@ def category_report():
 def groundhog():
     query = \
     """
-    SELECT a.year, 
+    SELECT cast(a.year as int), 
     Totalnumber_for_a_whole_year,
     avenumber, 
     groundhognum 
     FROM (SELECT Extract(year FROM t.date) AS Year,
     Sum(quantity) As Totalnumber_for_a_whole_year,
-    Sum(quantity) * 1.0 / 365 AS AveNumber 
+    round(Sum(quantity) * 1.0 / 365, 2) AS AveNumber 
     FROM TRANSACTION AS t 
     natural JOIN product 
     natural JOIN incategory 
@@ -290,46 +288,46 @@ def groundhog():
 def sofa():
     query = \
     """
-    SELECT Sum(p.regular_price * quantity * 0.75) - Sum(( CASE 
-    WHEN ( 
-    d.productid = p.productid 
-    AND d.date = t.date ) THEN d.discount_price 
-    ELSE p.regular_price 
-    END ) * quantity) AS 
-    difference, 
-    p.product_name AS 
-    product_name, 
-    p.productid AS 
-    product_ID, 
-    p.regular_price AS 
-    retail_price, 
-    Sum(t.quantity) AS 
-    total_quantity 
-    FROM TRANSACTION AS t 
-    LEFT JOIN product AS p 
-    ON t.productid = p.productid 
-    LEFT JOIN discount AS d 
-    ON d.productid = p.productid 
-    LEFT JOIN incategory AS ic 
-    ON ic.category_name = 'Couches' 
-    OR ic.category_name = 'Sofa' 
-    GROUP BY p.product_name, 
-    p.productid 
-    HAVING Sum(p.regular_price * quantity * 0.75) - Sum(( CASE 
-    WHEN ( 
-    d.productid = p.productid 
-    AND d.date = t.date ) THEN d.discount_price 
-    ELSE p.regular_price 
-    END ) * quantity) < -5000 
-    OR Sum(p.regular_price * quantity * 0.75) - Sum(( 
-    CASE 
-    WHEN ( d.productid = 
-    p.productid 
-    AND d.date = t.date ) THEN d.discount_price 
-    ELSE p.regular_price 
-    END ) * quantity) > 
-    5000 
-    ORDER BY difference DESC; 
+    SELECT Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
+                                                        WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN d.discount_price
+                                                        ELSE p.regular_price
+                                                      END ) * quantity) AS
+       difference,
+       p.product_name                                                   AS
+       product_name,
+       p.productid                                                      AS
+       product_ID,
+       p.regular_price                                                  AS
+       retail_price,
+       Sum(t.quantity)                                                  AS
+       total_quantity
+    FROM   TRANSACTION AS t
+        LEFT JOIN product AS p
+                ON t.productid = p.productid
+        LEFT JOIN discount AS d
+                ON d.productid = p.productid
+        LEFT JOIN incategory AS ic
+                ON ic.category_name = 'Couches'
+                    OR ic.category_name = 'Sofas'
+    GROUP  BY p.product_name,
+            p.productid
+    HAVING Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
+                                                            WHEN (
+                d.productid = p.productid
+                AND d.date = t.date ) THEN d.discount_price
+                                                            ELSE p.regular_price
+                                                        END ) * quantity) < -5000
+            OR Sum(p.regular_price * quantity * 0.75) - Sum((
+                CASE
+                WHEN ( d.productid =
+                        p.productid
+                        AND d.date = t.date ) THEN d.discount_price
+                ELSE p.regular_price
+                                                            END ) * quantity) >
+            5000
+    ORDER  BY difference DESC; 
     """
     header, table = db.execute(query)
     return render_template('sofa.html', table=table, header=header) 
@@ -363,12 +361,12 @@ def storeRev(selectstate):
     SELECT s.store_number,
     address,
     city_name,
-    Extract(year FROM t.date) AS Year,
-    Sum(quantity * ( CASE
+    cast(Extract(year FROM t.date) as integer) AS Year,
+    round(Sum(quantity * ( CASE
                         WHEN d.discount_price IS NULL THEN regular_price
                         WHEN d.discount_price IS NOT NULL THEN
                         d.discount_price
-                        END ))   AS Revenue
+                        END )))  AS Revenue
     FROM   store AS s
         natural JOIN city
         natural JOIN TRANSACTION AS t
@@ -455,20 +453,13 @@ def highestVol(yr, m):
 def revByPop():
     query = \
     """
-    CREATE EXTENSION IF NOT EXISTS tablefunc;
     SELECT CAST(year AS VARCHAR(10)), CAST(small AS INT),CAST(medium AS INT),CAST(large AS INT),CAST(extra_large AS INT)
  FROM
  (SELECT *
     FROM   crosstab ( 'WITH CityRevenue(year, city_size, revenue) AS (SELECT   year,
             city_size,
             Sum(revenue)AS revenue
-    FROM    (
-                    SELECT year,
-                        city_name,
-                        state,
-                        revenue
-                    FROM  (
-                                    SELECT    Extract(year FROM t.date) AS year,
+    FROM    (  SELECT    Extract(year FROM t.date) AS year,
                                             store_number,
                                             quantity*(
                                             CASE
@@ -481,11 +472,8 @@ def revByPop():
                                     AND       t.date=d.date
                                     LEFT JOIN product AS p
                                     ON        p.productid=t.productid )AS a natural
-                    JOIN   city                                         AS c) AS f natural
-    JOIN
-            (
-                    SELECT city_name,
-                        state,
+    JOIN(SELECT store_number,city_size FROM
+            (SELECT city_name,state,
                         CASE
                                 WHEN city_population<3700000 THEN ''small''
                                 WHEN city_population>=3700000
@@ -494,11 +482,11 @@ def revByPop():
                                 AND    city_population<9000000 THEN ''large''
                                 WHEN city_population>=9000000 THEN ''extra_large''
                         END AS city_size
-                    FROM   city) AS c
+                    FROM   city) AS c natural JOIN store AS a) AS p
     GROUP BY year,
             city_size
     ORDER BY year) 
-    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, small DOUBLE PRECISION, medium DOUBLE PRECISION, large DOUBLE PRECISION, extra_large DOUBLE PRECISION)) a;
+    SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, extra_large DOUBLE PRECISION, large DOUBLE PRECISION, medium DOUBLE PRECISION, small DOUBLE PRECISION)) a;
     """
     header, table = db.execute(query)
     return render_template('revByPop.html', table=table, header=header)   
@@ -508,7 +496,7 @@ def childcare():
     query = \
     """
     CREATE EXTENSION IF NOT EXISTS tablefunc;
-    SELECT   *
+    SELECT  mon, round(no_childcare) as no_childcare, round(max_15) as max_15, round(max_30) as max_30,round(max_60) as max_60
     FROM     crosstab ( 
     'WITH aggtable(mon, maximum_time, sum) AS
             (SELECT Sales.mon, Sales.maximum_time, SUM(Sales.revenue) 
@@ -526,8 +514,7 @@ def childcare():
                         LEFT JOIN Product AS P
                         ON T.productID = P.productID
                         WHERE T.date >= 
-                        date_trunc(''month'', CURRENT_DATE) - INTERVAL ''1 year'') AS Price
-
+                        date_trunc(''month'', date ''2012-07-01'') - INTERVAL ''1 year'') AS Price
                     LEFT JOIN Store 
                     ON Price.store_number = Store.store_number) AS PriceChild
                 LEFT JOIN Discount AS D

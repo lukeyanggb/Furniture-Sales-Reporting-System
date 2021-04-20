@@ -253,8 +253,8 @@ def category_report():
     header, table = db.execute(query)
     return render_template('category_report.html', table=table, header=header)
 
-@app.route('/gh')
-def gh():
+@app.route('/groundhog')
+def groundhog():
     query = \
     """
     SELECT cast(a.year as int), 
@@ -282,7 +282,55 @@ def gh():
     ON a.year = b.year; 
     """
     header, table = db.execute(query)
-    return render_template('gh.html', table=table, header=header)   
+    return render_template('groundhog.html', table=table, header=header)
+
+@app.route('/sofa')
+def sofa():
+    query = \
+    """
+    SELECT Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
+                                                        WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN d.discount_price
+                                                        ELSE p.regular_price
+                                                      END ) * quantity) AS
+       difference,
+       p.product_name                                                   AS
+       product_name,
+       p.productid                                                      AS
+       product_ID,
+       p.regular_price                                                  AS
+       retail_price,
+       Sum(t.quantity)                                                  AS
+       total_quantity
+    FROM   TRANSACTION AS t
+        LEFT JOIN product AS p
+                ON t.productid = p.productid
+        LEFT JOIN discount AS d
+                ON d.productid = p.productid
+        LEFT JOIN incategory AS ic
+                ON ic.category_name = 'Couches'
+                    OR ic.category_name = 'Sofas'
+    GROUP  BY p.product_name,
+            p.productid
+    HAVING Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
+                                                            WHEN (
+                d.productid = p.productid
+                AND d.date = t.date ) THEN d.discount_price
+                                                            ELSE p.regular_price
+                                                        END ) * quantity) < -5000
+            OR Sum(p.regular_price * quantity * 0.75) - Sum((
+                CASE
+                WHEN ( d.productid =
+                        p.productid
+                        AND d.date = t.date ) THEN d.discount_price
+                ELSE p.regular_price
+                                                            END ) * quantity) >
+            5000
+    ORDER  BY difference DESC; 
+    """
+    header, table = db.execute(query)
+    return render_template('sofa.html', table=table, header=header) 
 
 @app.route('/storeRevSelect')
 def storeRevSelect():

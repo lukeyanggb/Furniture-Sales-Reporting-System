@@ -12,16 +12,21 @@
 {% block body %}
 {{ super() }}
 <div style="margin-left: 100px">
-<h1>Couches and Sofas Report</h1>
+<h1>Actual versus Predicted Revenue for Couches and Sofas</h1>
 
 
 <table class="table">
     <thead>
       <tr>
-        <th>Year</th>
-        <th>Total Number Sold</th>
-        <th>Average Number Sold</th>
-        <th>Sales on GroundHog Day</th>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Retail Price</th>
+        <th>Total Quantity</th>
+        <th>Discount Quantity</th>
+        <th>Retail Price Quantity</th>
+        <th>Actual Revenue</th>
+        <th>Predicted Revenue</th>
+        <th>Difference</th>
       </tr>
     </thead>
     <tbody>

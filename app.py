@@ -288,21 +288,42 @@ def groundhog():
 def sofa():
     query = \
     """
-    SELECT Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
+    SELECT 
+       p.productid                                                      AS
+       product_ID,
+	   p.product_name                                                   AS
+       product_name,
+       p.regular_price                                                  AS
+       retail_price,
+       Sum(t.quantity)                                                  AS
+       total_quantity,
+	   Sum( case when (d.date = t.date) then t.quantity end) as discount_quantity,
+	   Sum( case when (d.date <> t.date) then t.quantity end) as retail_price_quantity,
+	   Sum(( CASE
                                                         WHEN (
               d.productid = p.productid
               AND d.date = t.date ) THEN d.discount_price
                                                         ELSE p.regular_price
-                                                      END ) * quantity) AS
-       difference,
-       p.product_name                                                   AS
-       product_name,
-       p.productid                                                      AS
-       product_ID,
-       p.regular_price                                                  AS
-       retail_price,
-       Sum(t.quantity)                                                  AS
-       total_quantity
+                                                      END ) * quantity) as actual_revenue,
+	   Sum(( CASE
+			  WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN p.regular_price * 0.75
+                                                        ELSE p.regular_price
+                                                      END ) * quantity)	as predicted_revenue,
+	   Sum(( CASE
+			  WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN p.regular_price * 0.75
+                                                        ELSE p.regular_price
+                                                      END ) * quantity)
+													  -
+													  Sum(( CASE
+                                                        WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN d.discount_price
+                                                        ELSE p.regular_price
+                                                      END ) * quantity) AS       difference
     FROM   TRANSACTION AS t
         LEFT JOIN product AS p
                 ON t.productid = p.productid
@@ -313,21 +334,34 @@ def sofa():
                     OR ic.category_name = 'Sofas'
     GROUP  BY p.product_name,
             p.productid
-    HAVING Sum(p.regular_price * quantity * 0.75) - Sum(( CASE
-                                                            WHEN (
-                d.productid = p.productid
-                AND d.date = t.date ) THEN d.discount_price
-                                                            ELSE p.regular_price
-                                                        END ) * quantity) < -5000
-            OR Sum(p.regular_price * quantity * 0.75) - Sum((
-                CASE
-                WHEN ( d.productid =
-                        p.productid
-                        AND d.date = t.date ) THEN d.discount_price
-                ELSE p.regular_price
-                                                            END ) * quantity) >
+    HAVING Sum(( CASE
+			  WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN p.regular_price * 0.75
+                                                        ELSE p.regular_price
+                                                      END ) * quantity)
+													  -
+													  Sum(( CASE
+                                                        WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN d.discount_price
+                                                        ELSE p.regular_price
+                                                      END ) * quantity) < -5000
+            OR Sum(( CASE
+			  WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN p.regular_price * 0.75
+                                                        ELSE p.regular_price
+                                                      END ) * quantity)
+													  -
+													  Sum(( CASE
+                                                        WHEN (
+              d.productid = p.productid
+              AND d.date = t.date ) THEN d.discount_price
+                                                        ELSE p.regular_price
+                                                      END ) * quantity) >
             5000
-    ORDER  BY difference DESC; 
+    ORDER  BY difference DESC;  
     """
     header, table = db.execute(query)
     return render_template('sofa.html', table=table, header=header) 

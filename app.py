@@ -253,8 +253,8 @@ def category_report():
     header, table = db.execute(query)
     return render_template('category_report.html', table=table, header=header)
 
-@app.route('/sofa')
-def couacheSofas():
+@app.route('/gh')
+def gh():
     query = \
     """
     SELECT cast(a.year as int), 
@@ -282,7 +282,7 @@ def couacheSofas():
     ON a.year = b.year; 
     """
     header, table = db.execute(query)
-    return render_template('sofa.html', table=table, header=header)   
+    return render_template('gh.html', table=table, header=header)   
 
 @app.route('/storeRevSelect')
 def storeRevSelect():

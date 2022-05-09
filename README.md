@@ -1,4 +1,4 @@
-# cs6400-2021-01-Team054
+## Furniture Sales Reporting System
 
 ## Postgresql configuration file
 You need a configuration file named `database.ini` to store all connection parameters.
@@ -17,8 +17,8 @@ Change `database`, `user`, `password` values to your local postgresql configurat
 `PostgreSQL` needs to be installed and running, `database.ini` with correct credentials created in the root directory.
 Run the following commands on terminal:
 ```
-git clone https://github.gatech.edu/cs6400-2021-01-spring/cs6400-2021-01-Team054.git
-cd cs6400-2021-01-Team054
+git clone https://github.com/lukeyanggb/Furniture-Sales-Reporting-System.git
+cd Furniture-Sales-Reporting-System
 pip install -r requirements.txt
 psql -f SchemaAndDemoData.sql
 python3 app.py

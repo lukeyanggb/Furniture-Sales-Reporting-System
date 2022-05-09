@@ -1,4 +1,5 @@
 ## Furniture Sales Reporting System
+Furniture Sales Reporting System is a sales reporting system with a dashboard UI to support enterprise decision making. It is designed and optimized for reporting and analysis over millions of records.
 
 ## Postgresql configuration file
 You need a configuration file named `database.ini` to store all connection parameters.

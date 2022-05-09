@@ -30,7 +30,7 @@ def index():
     """
     Select (select count(store_number) from store) As count_of_stores,
     (select count(store_number) from store where restaurant = 1 or snack_bar = 1) AS store_that_offers_food,
-    (select count(store_number) from store where maximum_time is not null) AS store_that_offers_childCare,
+    (select count(store_number) from store where maximum_time>0) AS store_that_offers_childCare,
     (select count(productid) from product) AS count_of_products,
     (select count(campaign_description) from campaign) As count_of_distinct_campaigns;
     """

@@ -2,3 +2,4 @@ venv
 database.ini
 __pycache__
 .DS_Store
+.vscode

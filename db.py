@@ -1,4 +1,3 @@
-from os import name
 import psycopg2
 from config import config
 

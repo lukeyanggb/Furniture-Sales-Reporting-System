@@ -17,6 +17,8 @@ Change `database`, `user`, `password` values to your local postgresql configurat
 ## Setup
 `PostgreSQL` needs to be installed and running, `database.ini` with correct credentials created in the root directory.
 Run the following commands on terminal:
+
+If `pip install -r requirements.txt` doesn't work, try `pip3 install -r requirements.txt`
 ```
 git clone https://github.com/lukeyanggb/Furniture-Sales-Reporting-System.git
 cd Furniture-Sales-Reporting-System

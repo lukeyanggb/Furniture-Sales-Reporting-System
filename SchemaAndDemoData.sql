@@ -102,28 +102,28 @@ INSERT INTO Date
 SELECT * FROM generate_series('2000-01-01'::date, '2012-07-01', interval '1' day) AS t(dt);
 
 -- City
-COPY City FROM '/data/City.tsv' WITH DELIMITER AS '	';
+COPY City FROM '/data/City.csv' WITH DELIMITER AS ',';
 
 -- Store
-COPY Store FROM '/data/Store.tsv' WITH DELIMITER AS '	';
+COPY Store FROM '/data/Store.csv' WITH DELIMITER AS ',';
 
 -- Campaign
-COPY Campaign FROM '/data/Campaign.tsv' WITH DELIMITER AS '	';
+COPY Campaign FROM '/data/Campaign.csv' WITH DELIMITER AS ',';
 
 -- Product
-COPY Product FROM '/data/Product.tsv' WITH DELIMITER AS '	';
+COPY Product FROM '/data/Product.csv' WITH DELIMITER AS ',';
 
 -- Category
-COPY Category FROM '/data/Category.tsv' WITH DELIMITER AS '	';
+COPY Category FROM '/data/Category.csv' WITH DELIMITER AS ',';
 
 -- InCategory
-COPY InCategory FROM '/data/InCategory.tsv' WITH DELIMITER AS '	';
+COPY InCategory FROM '/data/InCategory.csv' WITH DELIMITER AS ',';
 
 -- Holiday
-COPY Holiday FROM '/data/Holiday.tsv' WITH DELIMITER AS '	';
+COPY Holiday FROM '/data/Holiday.csv' WITH DELIMITER AS ',';
 
 -- Discount
-COPY Discount FROM '/data/Discount.tsv' WITH DELIMITER AS '	';
+COPY Discount FROM '/data/Discount.csv' WITH DELIMITER AS ',';
 
 -- Transaction
-COPY Transaction FROM '/data/Transaction.tsv' WITH DELIMITER AS '	';
+COPY Transaction FROM '/data/Transaction.csv' WITH DELIMITER AS ',';

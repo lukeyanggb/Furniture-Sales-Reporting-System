@@ -27,6 +27,18 @@ psql -f SchemaAndDemoData.sql
 python3 app.py
 ```
 
+If failed to load all data by `psql -f SchemaAndDemoData.sql`, go to the directory of data folder and manually load all data in `psql` command line:
+```bash
+\COPY City FROM 'City.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Store FROM 'Store.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Campaign FROM 'Campaign.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Product FROM 'Product.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Category FROM 'Category.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY InCategory FROM 'InCategory.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Holiday FROM 'Holiday.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Discount FROM 'Discount.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+\COPY Transaction FROM 'Transaction.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
+```
 ## Dependencies
 * Python>=3.7.9
 * Flask==1.1.2

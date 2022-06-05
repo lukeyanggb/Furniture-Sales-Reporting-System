@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, SubmitField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
 from wtforms.validators import DataRequired
 import db
 from datetime import datetime

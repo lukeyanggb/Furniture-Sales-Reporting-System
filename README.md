@@ -28,7 +28,7 @@ python3 app.py
 ```
 
 If failed to load all data by `psql -f SchemaAndDemoData.sql`, go to the directory of data folder and manually load all data in `psql` command line:
-```bash
+```sql
 \COPY City FROM 'City.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
 \COPY Store FROM 'Store.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
 \COPY Campaign FROM 'Campaign.csv' WITH DELIMITER AS ',' CSV ESCAPE '"';
@@ -47,7 +47,3 @@ If failed to load all data by `psql -f SchemaAndDemoData.sql`, go to the directo
 * Flask-Bootstrap4==4.0.2
 * WTForms==2.3.3
 * PostgreSQL>=12.1
-* tablefunc module installed for PostgreSQL to make pivot table:
-```sql
-CREATE EXTENSION IF NOT EXISTS tablefunc;
-```

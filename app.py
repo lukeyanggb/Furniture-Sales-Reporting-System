@@ -675,4 +675,4 @@ def test():
 if __name__ == '__main__':
     # Tells Flask to run, accessible from the specified host/port pair. Note
     # that the routes are loaded because of the import above.
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    app.run(host='localhost', port=8083, debug=True)

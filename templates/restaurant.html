@@ -1,47 +1,27 @@
 {% extends "base.html" %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-<h1>Restaurant Impact on Category Sales</h1>
-
- 
-<table class="table">
-    <thead>
-      <tr>
-        
-        <th>Category</th>
+  <h2>Restaurant Impact on Category Sales</h2>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Category</th>
           <th>Store type</th>
           <th>Quantity Sold</th>
-        
-     
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
         </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-{% endblock %}
+      </thead>
+      <tbody>
+        <tr>
+          {% for row in table %}     
+              {% for col in row %}
+                   <td>{{ col }}</td>
+               {% endfor %}
+        </tr>
+        {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
+{% endblock %}

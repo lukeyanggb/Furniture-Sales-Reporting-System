@@ -1,51 +1,29 @@
 {% extends "base.html" %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-
-<h1>Advertising Campaign Analysis</h1>
-
-
-<div class="table-responsive">
-
-<table class="table">
-    <thead>
-      <tr>
-        
-        <th>ProductID</th>
+  <h2>Advertising Campaign Analysis</h2>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>ProductID</th>
           <th>Product Name</th>
           <th>Sold During Campaign</th>
           <th>Sold Outside Campaign</th>
           <th>Difference</th>
-      
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
         </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-</div>
+      </thead>
+      <tbody>
+        <tr>
+          {% for row in table %}     
+              {% for col in row %}
+                   <td>{{ col }}</td>
+               {% endfor %}
+        </tr>
+        {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
 {% endblock %}

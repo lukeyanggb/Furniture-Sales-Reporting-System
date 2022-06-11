@@ -1,48 +1,28 @@
 {% extends "base.html" %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-  <h1>Revenue by Population</h1>
-
-  
-  <table class="table">
-    <thead>
-      <tr>
-        
-        <th>Year</th>
-        <th>Small</th>
-        <th>Medium</th>
-        <th>Large</th>
-        <th>Extra Large</th>
-        
-     
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
+  <h2>Revenue by Population</h2>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Small</th>
+          <th>Medium</th>
+          <th>Large</th>
+          <th>Extra Large</th>
         </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody>
+        <tr>
+          {% for row in table %}     
+              {% for col in row %}
+                   <td>{{ col }}</td>
+               {% endfor %}
+        </tr>
+        {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

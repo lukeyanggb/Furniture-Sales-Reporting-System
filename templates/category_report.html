@@ -1,41 +1,28 @@
 {% extends "base.html" %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-<h1>Category Report</h1>
-
-<table class="table">
-    <thead>
-      <tr>
-        <th>Category Name</th>
-        <th>Count</th>
-        <th>Min</th>
-        <th>Average</th>
-        <th>Max</th>
-  
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
+  <h2>Category Report</h2>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Category Name</th>
+          <th>Count</th>
+          <th>Min</th>
+          <th>Average</th>
+          <th>Max</th>
         </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody>
+        <tr>
+          {% for row in table %}     
+              {% for col in row %}
+                   <td>{{ col }}</td>
+               {% endfor %}
+        </tr>
+        {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

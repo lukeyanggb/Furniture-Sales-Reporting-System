@@ -1,39 +1,22 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-
-  <h1>Holiday</h1>
-
-
-<h2>View Holiday</h2>
-
-<h3>Select holiday name</h3>
-<div>
-    <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          Pick a holiday
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            {% for holiday in posts2 %}
-            <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
-        {% endfor%}
-    </ul>
-      </div>
-
-    <p></p>
-    <h3> Or select date</h3>
+  <h2>Holiday Information</h2>
+  <h3>View Holiday Dates</h3>
+  <h3>Select holiday name</h3>
+    <div>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+              Pick a holiday
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                {% for holiday in posts2 %}
+                <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
+            {% endfor%}
+          </ul>
+    </div>
+  <h3> Or select date</h3>
     <div class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
         Pick a date
@@ -42,18 +25,12 @@
           {% for holidaydate in posts1 %}
           <li><a class="dropdown-item" href="/holiday/{{holidaydate[0]}}">{{holidaydate[0]}}</a></li>
       {% endfor%}
-  </ul>
-</div>
+      </ul>
+    </div>
 
+  <h3>Add Holiday</h3>
 
-
-
-<h2>Add Holiday</h2>
-
-<div style="width: 30%">
-    {{ wtf.quick_form(form)}}
-</div>
-
-
-</div>
+  <div style="width: 30%">
+      {{ wtf.quick_form(form)}}
+  </div>
 {% endblock %}

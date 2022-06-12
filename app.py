@@ -19,7 +19,7 @@ class MonthHighestVol(FlaskForm):
     submit = SubmitField('Submit')
 
 class HolidayAdd(FlaskForm):
-    date = DateField("Pick a date: ", format='%Y-%m-%d', validators=[DataRequired()])
+    date = DateField("Pick a date (YYYY-MM-DD): ", format='%Y-%m-%d', validators=[DataRequired()])
     name = StringField('Enter the holiday name', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
@@ -153,7 +153,6 @@ def cityPopSelect():
     statequery = \
     """
     SELECT  distinct(state, city_name) FROM city;
-
     """
     _, cities = db.execute(statequery)
     return render_template('cityPopSelect.html', posts = cities)
@@ -161,7 +160,7 @@ def cityPopSelect():
 
 @app.route('/cityPop/<selectCity>')
 def cityPop(selectCity):
-    #selectCity
+    # selectCity
     # added city selection dropdown
     stateandcity =selectCity.split(',')
     state = stateandcity[0][1::]
@@ -183,7 +182,6 @@ def cityPop(selectCity):
          WHERE state =  \'%s\' and city_name =  \'%s\';
         """
     header, table = db.execute(query % (state, city))
- 
     return render_template('cityPopSelect.html', posts = cities, table=table, header=header)
 
 
@@ -191,8 +189,6 @@ def cityPop(selectCity):
 def cityPopUpdate():
     #selectCity
     # added city selection dropdown
-
-
     # *****************************************************************************
     # city and population number data has been received
     # you can print data and its types
@@ -363,7 +359,6 @@ def sofa():
                                                       END ) * quantity) >
             5000
     ORDER  BY difference DESC; 
- 
     """
     header, table = db.execute(query)
     return render_template('sofa.html', table=table, header=header) 
@@ -425,20 +420,18 @@ def storeRev(selectstate):
 @app.route('/highestVolSelect', methods=['GET', 'POST'])
 def highestVolSelect():
     selectmonth = request.form.get("Monthselect")
-   
     if selectmonth is not None:
         print(selectmonth)
         date = datetime.strptime(selectmonth, '%Y-%m')
         yr = date.year
         m = date.month
-        return redirect( url_for('highestVol', yr=yr, m=m) )
+        return redirect(url_for('highestVol', yr=yr, m=m))
     else:
         message = 'Sorry. There is no record for selected month.'
     return render_template('highestVolSelect.html')
 
-@app.route('/highestVol/<int:yr>/<int:m>', methods=['GET', 'POST'])
+@app.route('/highestVol/<int:yr>/<int:m>')
 def highestVol(yr, m):
-    
     query = \
     """
     SELECT category_name,
@@ -482,7 +475,7 @@ def highestVol(yr, m):
     WHERE  rank = 1 
     """
     header, table = db.execute(query % (yr, m)) 
-    return render_template('highestVol.html', table=table, header=header) 
+    return render_template('highestVol.html', table=table, header=header, yr=yr, m=m) 
 
 
 @app.route('/revByPop')

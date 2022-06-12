@@ -1,22 +1,9 @@
 {% extends "base.html" %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-<h1>Store Revenue by Year by State</h1>
-
-  <p></p>
-
-<div class="dropdown">
+<h2 class="m-3">Store Revenue by Year by State</h2>
+<hr class="style3">
+  <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
       Select State
     </button>
@@ -24,35 +11,28 @@
       {% for state in posts %}
         <li><a class="dropdown-item" href="/storeRev/{{state[0]}}">{{state[0]}}</a></li>
       {% endfor%}
-</ul>
-</div>
-
-<table class="table">
+    </ul>
+  </div>
+<hr class="style3">
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
     <thead>
       <tr>
-        
         <th>Store Number</th>
-          <th>Address</th>
-          <th>City Name</th>
-          <th>Year</th>
-          <th>Revenue</th>
-        
-    
+        <th>Address</th>
+        <th>City Name</th>
+        <th>Year</th>
+        <th>Revenue</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-  
         {% for row in table %}     
-     
             {% for col in row %}
                  <td>{{ col }}</td>
-            
              {% endfor %}
-        </tr>
+      </tr>
       {% endfor %}
-          
-        
       </tr>
     </tbody>
   </table>

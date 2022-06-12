@@ -2,33 +2,42 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% block body %}
 {{ super() }}
-  <h2>Holiday Information</h2>
-  <h3>View Holiday Dates</h3>
-  <h3>Select holiday name</h3>
-    <div>
+  <h2 class="m-3">Holiday Information</h2>
+  <hr class="style3">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Select holiday name</h4>
         <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-              Pick a holiday
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                {% for holiday in posts2 %}
-                <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
-            {% endfor%}
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Pick a holiday
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              {% for holiday in posts2 %}
+              <li><a class="dropdown-item" href="/holiday/{{holiday[0]}}">{{holiday[0]}}</a></li>
+          {% endfor%}
           </ul>
+        </div>
+      </div>
+    
+      <div class="col-sm">
+        <h4> Or pick a date</h4>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Pick a date
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              {% for holidaydate in posts1 %}
+              <li><a class="dropdown-item" href="/holiday/{{holidaydate[0]}}">{{holidaydate[0]}}</a></li>
+          {% endfor%}
+          </ul>
+        </div>
+      </div>
     </div>
-  <h3> Or select date</h3>
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-        Pick a date
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-          {% for holidaydate in posts1 %}
-          <li><a class="dropdown-item" href="/holiday/{{holidaydate[0]}}">{{holidaydate[0]}}</a></li>
-      {% endfor%}
-      </ul>
-    </div>
+  </div>
 
-  <h3>Add Holiday</h3>
+  <hr class="style3">
+  <h3>Mannually add a holiday</h3>
 
   <div style="width: 30%">
       {{ wtf.quick_form(form)}}

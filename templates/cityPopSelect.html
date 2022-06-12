@@ -1,25 +1,10 @@
 {% extends "base.html" %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-<h1>City Population</h1>
-
-<p></p>
-<h3>View City Population</h3>
-
-<p></p>
-
-<div class="dropdown">
+<h2 class="m-3">City Population</h2>
+<hr class="style3">
+<h4>View City Population</h4>
+  <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
       Find City
     </button>
@@ -27,63 +12,42 @@
         {% for city in posts %}
         <li><a class="dropdown-item" href="/cityPop/{{city[0]}}">{{city[0]}}</a></li>
         {% endfor%}
-</ul>
+    </ul>
   </div>
-
-<p></p>
-
-
-     <p></p>
-  <p></p>
-  <p></p>
-
-
-
-
-  <h3>Update city population:</h3>
-
-<h4> Please select the city and enter the population:</h4>
-    <div>
+<hr class="style3">
+<h4>Update city population</h4>
+<p> Please select the city and enter the population</p>
+  <div>
     <form method="post" action="/cityPopUpdate">
-<select name="cityoption">
-        {% for city in posts %}
-            <option value="{{city[0]}}">{{city[0]}}</option>
-    {% endfor%}
-</select>
-        <input type = 'Population' name = "Population" placeholder = "Enter number" value = "{{Population if Population}}"/>
-    <input type = "submit" value = "submit"/>
+      <select name="cityoption">
+              {% for city in posts %}
+                  <option value="{{city[0]}}">{{city[0]}}</option>
+          {% endfor%}
+      </select>
+      <input type = 'Population' name = "Population" placeholder = "Enter number" value = "{{Population if Population}}"/>
+      <input type = "submit" value = "submit"/>
     </form>
-</div>
-
-<p></p>
-<p></p>
-<p></p>
-<table class="table">
-  <thead>
-    <tr>
-      <th>State</th>
-      <th>City Name</th>
-      <th>Population</th>
-      
-
-
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-
-      {% for row in table %}
-
-          {% for col in row %}
-               <td>{{ col }}</td>
-
-           {% endfor %}
-      </tr>
-    {% endfor %}
-
-
-    </tr>
-  </tbody>
-</table>
-</div>
-  {% endblock %}
+  </div>
+<hr class="style3">
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>City Name</th>
+          <th>Population</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {% for row in table %}     
+              {% for col in row %}
+                  <td>{{ col }}</td>
+              {% endfor %}
+        </tr>
+        {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,48 +1,29 @@
 {% extends "base.html" %}
-
-{% block nav_there %}active{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-
-
-
 {% block body %}
 {{ super() }}
-<div style="margin-left: 100px">
-<h1>Childcare Sales Volume</h1>
-
-
-<table class="table">
-    <thead>
-      <tr>
-        
-        <th>Month</th>
-        <th>No Childcare</th>
-        <th>Maximum 30 min</th>
-        <th>Maximum 45 min</th>
-        <th>Maximum 60 min</th>
-      
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-  
-        {% for row in table %}     
-     
-            {% for col in row %}
-                 <td>{{ col }}</td>
-            
-             {% endfor %}
+  <h2 class="m-3">Influence of Childcare Service on Monthly Salses</h2>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>No Childcare</th>
+          <th>Maximum 30 min</th>
+          <th>Maximum 45 min</th>
+          <th>Maximum 60 min</th>
         </tr>
-      {% endfor %}
-          
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody>
+        <tr>
+          {% for row in table %}     
+              {% for col in row %}
+                   <td>{{ col }}</td>
+               {% endfor %}
+        </tr>
+        {% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
 {% endblock %}
 

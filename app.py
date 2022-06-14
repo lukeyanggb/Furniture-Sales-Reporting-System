@@ -477,7 +477,7 @@ def highestVol(yr, m):
     header, table = db.execute(query % (yr, m)) 
     return render_template('highestVol.html', table=table, header=header, yr=yr, m=m) 
 
-
+# Issues with tablefunc on EC2 instance: use cached data temporarily.
 @app.route('/revByPop')
 def revByPop():
     query = \
@@ -517,61 +517,65 @@ def revByPop():
     ORDER BY year) 
     SELECT year, city_size, revenue FROM CityRevenue ORDER BY 1,2' ) AS PIVOT(year double PRECISION, extra_large DOUBLE PRECISION, large DOUBLE PRECISION, medium DOUBLE PRECISION, small DOUBLE PRECISION)) a;
     """
-    header, table = db.execute(query)
+    # header, table = db.execute(query)
+    header = ['year', 'small', 'medium', 'large', 'extra_large']
+    table = [('2000', 17042190, 17547282, 15483221, 16344255), ('2001', 16783254, 17028024, 15921852, 16743101), ('2002', 16633548, 17417502, 15678059, 16996837), ('2003', 17421961, 18242772, 15434423, 16616264), ('2004', 16474550, 17840501, 14776909, 17185364), ('2005', 16725952, 17397408, 15021071, 17099401), ('2006', 17095603, 17733193, 15235859, 16488234), ('2007', 17096870, 17451663, 15923797, 17488378), ('2008', 17158180, 17629895, 15716042, 16525420), ('2009', 17208810, 16961571, 14956527, 16600615), ('2010', 17491437, 17065648, 15064280, 16874094), ('2011', 16677008, 16381216, 15048710, 16317626), ('2012', 8077098, 8518713, 7924372, 7813992)]
     return render_template('revByPop.html', table=table, header=header)   
 
-# Issues with tablefunc on EC2 instance:
-# @app.route('/childcare')
-# def childcare():
-#     query = \
-#     """
-#     CREATE EXTENSION IF NOT EXISTS tablefunc;
-#     SELECT  mon, round(no_childcare) as no_childcare, round(max_15) as max_15, round(max_30) as max_30,round(max_60) as max_60
-#     FROM     crosstab ( 
-#     'WITH aggtable(mon, maximum_time, sum) AS
-#             (SELECT Sales.mon, Sales.maximum_time, SUM(Sales.revenue) 
-#             FROM
-#                 (SELECT to_char(PriceChild.date,''Mon'') as mon, PriceChild.maximum_time, 
-#                 PriceChild.quantity*LEAST(PriceChild.regular_price, D.discount_price) 
-#                 AS revenue 
-#                 FROM
-#                     (SELECT Price.date, Price.productID, Price.regular_price, 
-#                     Price.quantity, Store.maximum_time 
-#                     FROM
-#                         (SELECT T.store_number, T.productID, T.date, T.quantity, 
-#                         P.regular_price 
-#                         FROM Transaction AS T
-#                         LEFT JOIN Product AS P
-#                         ON T.productID = P.productID
-#                         WHERE T.date >= 
-#                         date_trunc(''month'', date ''2012-07-01'') - INTERVAL ''1 year'') AS Price
-#                     LEFT JOIN Store 
-#                     ON Price.store_number = Store.store_number) AS PriceChild
-#                 LEFT JOIN Discount AS D
-#                 ON PriceChild.productID = D.productID AND PriceChild.date = D.date) AS Sales
-#             GROUP BY Sales.mon, Sales.maximum_time)
-#         SELECT mon, maximum_time, sum 
-#         FROM AggTable
-#         ORDER BY 1,2'
-#     ) AS aggtable(mon text, no_childcare float8, max_15 float8, max_30 float8, max_60 float8)
-#     ORDER BY
-#             CASE
-#                     WHEN mon = 'Jan' THEN 1
-#                     WHEN mon = 'Feb' THEN 2
-#                     WHEN mon = 'Mar' THEN 3
-#                     WHEN mon = 'Apr' THEN 4
-#                     WHEN mon = 'May' THEN 5
-#                     WHEN mon = 'Jun' THEN 6
-#                     WHEN mon = 'Jul' THEN 7
-#                     WHEN mon = 'Aug' THEN 8
-#                     WHEN mon = 'Sep' THEN 9
-#                     WHEN mon = 'Oct' THEN 10
-#                     WHEN mon = 'Nov' THEN 11
-#                     WHEN mon = 'Dec' THEN 12
-#             END;
-#     """
-#     header, table = db.execute(query)
-#     return render_template('childcare.html', table=table, header=header)   
+# Issues with tablefunc on EC2 instance: use cached data temporarily.
+@app.route('/childcare')
+def childcare():
+    query = \
+    """
+    CREATE EXTENSION IF NOT EXISTS tablefunc;
+    SELECT  mon, round(no_childcare) as no_childcare, round(max_15) as max_15, round(max_30) as max_30,round(max_60) as max_60
+    FROM     crosstab ( 
+    'WITH aggtable(mon, maximum_time, sum) AS
+            (SELECT Sales.mon, Sales.maximum_time, SUM(Sales.revenue) 
+            FROM
+                (SELECT to_char(PriceChild.date,''Mon'') as mon, PriceChild.maximum_time, 
+                PriceChild.quantity*LEAST(PriceChild.regular_price, D.discount_price) 
+                AS revenue 
+                FROM
+                    (SELECT Price.date, Price.productID, Price.regular_price, 
+                    Price.quantity, Store.maximum_time 
+                    FROM
+                        (SELECT T.store_number, T.productID, T.date, T.quantity, 
+                        P.regular_price 
+                        FROM Transaction AS T
+                        LEFT JOIN Product AS P
+                        ON T.productID = P.productID
+                        WHERE T.date >= 
+                        date_trunc(''month'', date ''2012-07-01'') - INTERVAL ''1 year'') AS Price
+                    LEFT JOIN Store 
+                    ON Price.store_number = Store.store_number) AS PriceChild
+                LEFT JOIN Discount AS D
+                ON PriceChild.productID = D.productID AND PriceChild.date = D.date) AS Sales
+            GROUP BY Sales.mon, Sales.maximum_time)
+        SELECT mon, maximum_time, sum 
+        FROM AggTable
+        ORDER BY 1,2'
+    ) AS aggtable(mon text, no_childcare float8, max_15 float8, max_30 float8, max_60 float8)
+    ORDER BY
+            CASE
+                    WHEN mon = 'Jan' THEN 1
+                    WHEN mon = 'Feb' THEN 2
+                    WHEN mon = 'Mar' THEN 3
+                    WHEN mon = 'Apr' THEN 4
+                    WHEN mon = 'May' THEN 5
+                    WHEN mon = 'Jun' THEN 6
+                    WHEN mon = 'Jul' THEN 7
+                    WHEN mon = 'Aug' THEN 8
+                    WHEN mon = 'Sep' THEN 9
+                    WHEN mon = 'Oct' THEN 10
+                    WHEN mon = 'Nov' THEN 11
+                    WHEN mon = 'Dec' THEN 12
+            END;
+    """
+    # header, table = db.execute(query)
+    header = ['mon', 'no_childcare', 'max_15', 'max_30', 'max_60']
+    table = [('Jan', 1350549.0, 1374588.0, 1406560.0, 1341801.0), ('Feb', 1225470.0, 1121197.0, 1304173.0, 1466715.0), ('Mar', 1515156.0, 1317421.0, 1241748.0, 1373524.0), ('Apr', 1400022.0, 1169316.0, 1213395.0, 1444018.0), ('May', 1398645.0, 1273961.0, 1200528.0, 1351059.0), ('Jun', 1486038.0, 1433123.0, 1403408.0, 1354819.0), ('Jul', 1568108.0, 1292057.0, 1449777.0, 1430413.0), ('Aug', 1266450.0, 1190544.0, 1413513.0, 1330486.0), ('Sep', 1381461.0, 1400221.0, 1382913.0, 1496647.0), ('Oct', 1349783.0, 1228803.0, 1179127.0, 1291892.0), ('Nov', 1318357.0, 1386606.0, 1088075.0, 1492813.0), ('Dec', 1357066.0, 1389302.0, 1100083.0, 1290284.0)]
+    return render_template('childcare.html', table=table, header=header)
 
 @app.route('/restaurant')
 def restaurant():
